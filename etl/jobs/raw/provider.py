@@ -49,7 +49,6 @@ def read_parquet_data(engine:SparkSession,
     df: DataFrame
         A DataFrame with the loaded data.
     """
-    print(f"Reading data from the {path} parquet file...")
     df = engine.read.parquet(path, **kwargs)
     return df
 

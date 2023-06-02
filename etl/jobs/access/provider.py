@@ -39,17 +39,13 @@ def read_parquet_data(engine:SparkSession,
     """
     Read data from a parquet file, returning a DataFrame.
     """
-    print(f"Reading data from the {path} parquet file...")
-    print(f"\tdf = engine.read.parquet({path}, {kwargs})")
     df = engine.read.parquet(path, **kwargs)
     return df
 
 def transform_data(provider_input:DataFrame,location_input:DataFrame) -> DataFrame:
     """
     Return a DataFrame with the distinct rows from `df1` and `df2`, with a monotonically increasing surrogate `surrogate_key`.
-    """
-    print(f"Transforming data...")
-        
+    """        
     transformed_df = (
         provider_input
         .withColumn('provider_key', monotonically_increasing_id())
@@ -68,5 +64,4 @@ def transform_data(provider_input:DataFrame,location_input:DataFrame) -> DataFra
     return with_slowly_changing_dimensions(transformed_df)
 
 def write_data(df:DataFrame, path:str, **kwargs):
-    print(f"Writing data to the {path} parquet file...")
     df.write.parquet(path, **kwargs)

@@ -61,8 +61,6 @@ def read_parquet_data(engine:SparkSession,
     """
     Read data from a parquet file, returning a DataFrame.
     """
-    print(f"Reading data from the {path} parquet file...")
-    print(f"\tdf = engine.read.parquet({path}, {kwargs})")
     df = engine.read.parquet(path, **kwargs)
     return df    
 
@@ -95,8 +93,7 @@ def transform_data(claim_access_df: DataFrame,
             how='left')
         # Select the required facts from the claim access table and the 
         # surrogate keys from the dimension tables.
-        .select(
-                'claim_id',
+        .select('claim_id',
                 'provider_key',
                 'policyholder_key',
                 'procedure_key',

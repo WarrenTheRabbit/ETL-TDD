@@ -1,13 +1,9 @@
-import boto3
-import pytz
 import re
+import pytz
 from datetime import datetime
-from typing import Optional, Union
-from etl.paths.components import Bucket
 from etl.mock.infrastructure.s3utils import S3Resource
-def get_timestamp_for_file(*, 
-                        time_required: str, 
-                        path: str) -> str:
+
+def get_timestamp_for_file(*, time_required: str, path: str) -> str:
     """
     Returns a string representing a timestamp with format YYYYMMDDHHMM.
     
@@ -62,7 +58,6 @@ def parse_s3_path(path):
         raise ValueError('Invalid S3 path')
 
 
-
 def get_timestamp_of_most_recently_created_file(path:str) -> str:
     """Return the timestamp of the most recently created file that is 
     listable at the provided path.
@@ -78,21 +73,16 @@ def get_timestamp_of_most_recently_created_file(path:str) -> str:
         ValueError: If no files are found in the bucket.
         ValueError: If no dates are found in the bucket.
     """
-
-    # bucket, prefix = parse.parse("s3://{}/{}", path)
+    
     bucket, prefix = parse_s3_path(path)
 
-    # Get the existing Singleton
+    # Get the existing Singleton.
     s3_resource = S3Resource.getInstance()
     s3 = s3_resource.get_resource()
     bucket = s3.Bucket(str(bucket))
-    print(f"bucket = {bucket}")
-    print(f"path = {path}")
-    print(f"prefix = {prefix}")
     
     file_paths = [obj for obj in bucket.objects.filter(Prefix=prefix)]
     if not file_paths:
-        print(f"Prefix: {prefix}")
         raise ValueError("No files found in bucket.")
 
     dates = []
@@ -128,7 +118,6 @@ def get_lexicographically_highest_subdirectory(bucket, prefix) -> str:
     bucket = s3.Bucket(str(bucket))
     
     candidate_dates = []
-    print(bucket)
     for obj in bucket.objects.filter(Prefix=prefix):
         subdirs = obj.key.split('/')
         leaf = subdirs[-2:][0]

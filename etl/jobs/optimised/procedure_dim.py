@@ -30,8 +30,6 @@ def read_parquet_data(engine:SparkSession,
     """
     Read data from a parquet file, returning a DataFrame.
     """
-    print(f"Reading data from the {path} parquet file...")
-    print(f"\tdf = engine.read.parquet({path}, {kwargs})")
     df = engine.read.parquet(path, **kwargs)
     return df    
 

@@ -108,19 +108,16 @@ def create_path(*,
         timestamp = get_timestamp_for_file(time_required=time_requested, 
                                            path=f"{root}/{prefix}")
         full_path = f"{root}/{prefix}/{timestamp}{file_extension}"
-        print(full_path)
         return full_path
     elif time_requested == 'now' and not file_extension:
         timestamp = get_current_time_as_timestamp()
    
         full_path = f"{root}/{prefix}/{timestamp}/"
-        print(full_path)
         return full_path
     elif time_requested == 'now' and file_extension:
         timestamp = get_current_time_as_timestamp()
    
         full_path =  f"{root}/{prefix}/{timestamp}{file_extension}"
-        print(full_path)
         return full_path
     else:
         return("ERROR")
