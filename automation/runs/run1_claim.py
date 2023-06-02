@@ -12,7 +12,7 @@ from etl.mock.infrastructure.s3_bucket import get_mock_s3_server_and_its_local_p
 
 def run(spark: SparkSession):
     import stage_source_into_landing
-    stage_source_into_landing.run()
+    stage_source_into_landing.run(spark)
 
     import stage_claim_into_raw
     stage_claim_into_raw.run(spark)
