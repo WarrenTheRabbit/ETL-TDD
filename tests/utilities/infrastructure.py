@@ -6,9 +6,9 @@ from colorama import Fore, Style
 from etl.mock.infrastructure import s3_bucket
 from etl.mock.infrastructure import buckets as test_infrastructure
 from etl.paths.components import Bucket
-from tests.utilities.actions import Actions
+from tests.utilities.actions import TestActions
 
-def with_test_server(actions:Actions):
+def with_test_server(actions:TestActions):
     def inner_decorator(test_function):
         def wrapped_test(glueContext):
             spark = glueContext.spark_session
