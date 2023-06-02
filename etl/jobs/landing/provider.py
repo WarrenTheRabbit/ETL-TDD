@@ -5,26 +5,24 @@ from pyspark.sql.types import StructType
 
 # claim_db.provider | Landing -> Raw
 
-input_path = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.LANDING,
-    tier=Tier.LANDING,
-    source=Source.CLAIM_DB,
-    table=Table.PROVIDER,
-    load=Load.FULL,
-    time_requested='recent',
-    file_extension='.csv'   
-)
+def get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.LANDING,
+                       tier=Tier.LANDING,
+                       source=Source.CLAIM_DB,
+                       table=Table.PROVIDER,
+                       load=Load.FULL,
+                       time_requested='recent',
+                       file_extension='.csv')
 
-output_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.RAW,
-    tier=Tier.RAW,
-    source=Source.CLAIM_DB,
-    table=Table.PROVIDER,
-    load=Load.FULL,
-    time_requested='now'
-)
+def get_output_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.RAW,
+                       tier=Tier.RAW,
+                       source=Source.CLAIM_DB,
+                       table=Table.PROVIDER,
+                       load=Load.FULL,
+                       time_requested='now')
 
 def read_data(engine:SparkSession,
             path:str,

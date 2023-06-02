@@ -9,26 +9,24 @@ from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier
 from etl.paths.create import create_path
 
 # A path to claim_db.policyholder table data that has been staged in Raw.
-input_path = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.RAW,
-    tier=Tier.RAW,
-    source=Source.CLAIM_DB,
-    table=Table.POLICYHOLDER,
-    load=Load.FULL,
-    time_requested='recent'
-)
+def get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.RAW,
+                       tier=Tier.RAW,
+                       source=Source.CLAIM_DB,
+                       table=Table.POLICYHOLDER,
+                       load=Load.FULL,
+                       time_requested='recent')
 
 # A path for claim_db.policyholder table data to be staged to Access.
-output_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.ACCESS,
-    tier=Tier.ACCESS,
-    source=Source.CLAIM_DB,
-    table=Table.POLICYHOLDER,
-    load=Load.FULL,
-    time_requested='now'
-)
+def get_output_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.ACCESS,
+                       tier=Tier.ACCESS,
+                       source=Source.CLAIM_DB,
+                       table=Table.POLICYHOLDER,
+                       load=Load.FULL,
+                       time_requested='now')
 
 def read_parquet_data(engine:SparkSession,
             path:str,
