@@ -1,63 +1,64 @@
-from etl.paths.components import Bucket, Source, Dimension, Fact, Table, Environment, Load, Tier, create_path
+from etl.paths.components import Bucket, Source, Dimension, Fact, Table, Environment, Load, Tier
+from etl.paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import monotonically_increasing_id
 from typing import List
 
 # claim_dim | Access -> Optimised
 
-claim_access_input_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.ACCESS,
-    source=Source.CLAIM_DB,
-    table=Table.CLAIM,
-    load=Load.FULL,
-    time_required='recent'
+def get_claim_access_get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.ACCESS,
+                       source=Source.CLAIM_DB,
+                       table=Table.CLAIM,
+                       load=Load.FULL,
+    time_requested='recent'
 )
  
-date_dim_input_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    dimension=Dimension.DATE,
-    load=Load.FULL,
-    time_required='recent'
+def get_date_dim_get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       dimension=Dimension.DATE,
+                       load=Load.FULL,
+                       time_requested='recent'
 )
 
-policyholder_dim_input_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    dimension=Dimension.POLICYHOLDER,
-    load=Load.FULL,
-    time_required='recent'
+def get_policyholder_dim_get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       dimension=Dimension.POLICYHOLDER,
+                       load=Load.FULL,
+                       time_requested='recent'
 )
 
-provider_dim_input_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    dimension=Dimension.PROVIDER,
-    load=Load.FULL,
-    time_required='recent'
+def get_provider_dim_get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       dimension=Dimension.PROVIDER,
+                       load=Load.FULL,
+                       time_requested='recent'
 ) 
 
-procedure_dim_input_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    dimension=Dimension.PROCEDURE,
-    load=Load.FULL,
-    time_required='recent'
+def get_procedure_dim_get_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       dimension=Dimension.PROCEDURE,
+                       load=Load.FULL,
+                       time_requested='recent'
 )
 
-claim_fact_output_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    fact=Fact.CLAIM,
-    load=Load.FULL,
-    time_required='now')
+def get_claim_fact_output_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       fact=Fact.CLAIM,
+                       load=Load.FULL,
+                       time_requested='now')
 
 def read_parquet_data(engine:SparkSession,
             path:str,

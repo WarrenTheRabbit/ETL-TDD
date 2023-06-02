@@ -1,36 +1,36 @@
-from etl.paths.components import Bucket, Source, Table, Dimension, Environment, Load, Tier, create_path
+from etl.paths.components import Bucket, Source, Table, Dimension, Environment, Load, Tier
+from etl.paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.optimised.attributes import with_slowly_changing_dimensions
 from pyspark.sql.functions import current_timestamp, from_unixtime, lit, monotonically_increasing_id, unix_timestamp
 
 # policyholder_dim | Access -> Optimised
 
-policyholder_table_input_path = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.ACCESS,
-    source=Source.CLAIM_DB,
-    table=Table.POLICYHOLDER,
-    load=Load.FULL,
-    time_required='recent'
-)
+def get_policyholder_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.ACCESS,
+                       source=Source.CLAIM_DB,
+                       table=Table.POLICYHOLDER,
+                       load=Load.FULL,
+                       time_requested='recent')
 
-location_dim_input_path = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
-    tier=Tier.OPTIMISED,
-    dimension=Dimension.LOCATION,
-    load=Load.FULL,
-    time_required='recent'
-)
+def get_location_input_path():
+    return create_path(environment=Environment.PROD,
+                       bucket=Bucket.PROJECT,
+                       tier=Tier.OPTIMISED,
+                       dimension=Dimension.LOCATION,
+                       load=Load.FULL,
+                       time_requested='recent')
 
-policyholder_dimension_output_path = create_path(
+def get_policyholder_output_path():
+    return create_path(
     environment=Environment.PROD,
     bucket=Bucket.PROJECT,
     tier=Tier.OPTIMISED,
     dimension=Dimension.POLICYHOLDER,
     load=Load.FULL,
-    time_required='now'
+    time_requested='now'
 )
 
 def read_parquet_data(engine:SparkSession,

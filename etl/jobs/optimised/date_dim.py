@@ -1,4 +1,5 @@
-from etl.paths.components import Bucket, Dimension, Environment, Load, Tier, create_path
+from etl.paths.components import Bucket, Dimension, Environment, Load, Tier
+from etl.paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as F
 from holidays import Australia
@@ -14,7 +15,7 @@ output_path:str = create_path(
     tier=Tier.OPTIMISED,
     dimension=Dimension.DATE,
     load=Load.FULL,
-    time_required='now'
+    time_requested='now'
 )
 
 def create_date_dimension() -> pd.DataFrame:
