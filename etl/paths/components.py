@@ -55,19 +55,19 @@ class Bucket(StringEnum):
     """The path component used by the ETL pipeline in production to reference
     the S3 bucket."""
     
-    LANDING = "landing-dev-wm"
-    RAW = "project-dev-wm" 
-    ACCESS = "project-dev-wm"
-    OPTIMISED = "project-dev-wm"
-    TEST = "test-dev-wm"
-    PROJECT = "project-dev-wm"
+    LANDING = "project-lf"
+    RAW = "project-lf"
+    ACCESS = "project-lf"
+    OPTIMISED = "project-lf"
+    TEST = "project-lf"
+    PROJECT = "project-lf"
     
 class Tier(StringEnum):
     """"""
-    LANDING = "landing"
-    RAW = "raw" 
-    ACCESS = "access"
-    OPTIMISED = "optimised"
+    LANDING = "etl/landing"
+    RAW = "etl/raw" 
+    ACCESS = "etl/access"
+    OPTIMISED = "etl/optimised"
     
 class Source(StringEnum):
     """The path component used by the ETL pipeline when a process is closely
@@ -118,13 +118,8 @@ class Environment(StringEnum):
     PROD = "s3"
     DEV = 'file'
     
-import boto3
-import boto3.resources.base as ServiceResource
-import pytz
-from datetime import datetime
-
-session = boto3.Session()
-s3 = session.resource('s3')
+    
+    
     
 
 
