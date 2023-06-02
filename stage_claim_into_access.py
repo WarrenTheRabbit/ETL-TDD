@@ -11,26 +11,28 @@ from awsglue.job import Job
 
 def run(spark:SparkSession):
         
-        # Read in data needed for transformations.
-        read_path = get_input_path()
-        read_df:DataFrame = read_parquet_data(engine=spark, 
-                                              path=read_path)
+    # Read in data needed for transformations.
+    read_path = get_input_path()
+    read_df:DataFrame = read_parquet_data(engine=spark, 
+                                            path=read_path)
 
-        # Apply transformations.        
-        transformed_df:DataFrame = transform_data(read_df)
+    # Apply transformations.        
+    transformed_df:DataFrame = transform_data(read_df)
 
-        # Write transformed data to path.
-        write_path = get_output_path()
-        write_data(df=transformed_df, 
-                   path=write_path, 
-                   mode='overwrite')
+    # Write transformed data to path.
+    write_path = get_output_path()
+    write_data(df=transformed_df, 
+                path=write_path, 
+                mode='overwrite') 
+    
+    return transformed_df
 
 if __name__ == "__main__":
-        args = getResolvedOptions(sys.argv, ['JOB_NAME'])
-        sc = SparkContext()
-        glueContext = GlueContext(sc)
-        spark = glueContext.spark_session
-        job = Job(glueContext)
-        job.init(args['JOB_NAME'], args)
-        run(spark)
-        job.commit()
+    args = getResolvedOptions(sys.argv, ['JOB_NAME'])
+    sc = SparkContext()
+    glueContext = GlueContext(sc)
+    spark = glueContext.spark_session
+    job = Job(glueContext)
+    job.init(args['JOB_NAME'], args)
+    run(spark)
+    job.commit()

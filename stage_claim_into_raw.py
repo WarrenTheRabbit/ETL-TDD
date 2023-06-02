@@ -1,19 +1,18 @@
 import sys
-import logging
+
+from awsglue.transforms import *
+from awsglue.utils import getResolvedOptions
+from awsglue.context import GlueContext
+from awsglue.job import Job
+from pyspark.sql import SparkSession, DataFrame
+from pyspark.context import SparkContext
+
 from etl.validation.schemas import landing as claim_schema
 from etl.jobs.landing import claim
 from etl.jobs.landing.claim import read_data, transform_data, write_data, \
     get_input_path, get_output_path
 
-from awsglue.transforms import *
-from awsglue.utils import getResolvedOptions
-from pyspark.context import SparkContext
-from awsglue.context import GlueContext
-from awsglue.job import Job
-
-from pyspark.sql import SparkSession, DataFrame
-
-def run(spark:SparkSession):
+def run(spark:SparkSession) -> DataFrame:
     
     # Read in data needed for transformations.    
     read_path = get_input_path()
@@ -29,8 +28,10 @@ def run(spark:SparkSession):
     write_path = get_output_path()
     write_data(df=transformed_df, 
                path=write_path, 
-               mode='overwrite')
+               mode='overwrite') 
     
+    # Return transformed data for optional testing.
+    return transformed_df
     
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])

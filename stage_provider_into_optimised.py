@@ -25,7 +25,9 @@ def run(spark:SparkSession):
     write_path = get_provider_output_path()
     write_data(df=transformed_df, 
                 path=write_path, 
-                mode='overwrite')
+                mode='overwrite') 
+    
+    return transformed_df
 
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])

@@ -37,11 +37,13 @@ def run(spark:SparkSession):
                                         procedure_dim_df=procedure_dim_df,
                                         provider_dim_df=provider_dim_df)
 
-        # Write transformed data to path.
+    # Write transformed data to path.
         write_path = get_claim_fact_output_path()
         write_data(df=transformed_df, 
                    path=write_path, 
-                   mode='overwrite')      
+                   mode='overwrite') 
+        
+        return transformed_df      
 
 
 if __name__ == '__main__':
