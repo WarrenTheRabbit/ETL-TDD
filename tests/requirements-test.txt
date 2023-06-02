@@ -1,0 +1,12 @@
+cfn-lint 
+flake8 
+pytest-cov 
+pytest 
+pandas 
+moto[server]==4.0.2
+flask
+flask_cors
+mocker
+pytest-mock
+freezegun
+
