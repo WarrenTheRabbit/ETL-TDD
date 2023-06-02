@@ -1,11 +1,10 @@
 import boto3
 import pytz
-import parse
+import re
 from datetime import datetime
 from typing import Optional, Union
 from etl.paths.components import Bucket
-
-
+from etl.mock.infrastructure.s3utils import S3Resource
 def get_timestamp_for_file(*, 
                         time_required: str, 
                         path: str) -> str:
@@ -53,8 +52,17 @@ def get_timestamp_for_file(*,
         # return it.       
         timestamp = get_timestamp_of_most_recently_created_file(path)
         return timestamp
-    
-    
+
+
+def parse_s3_path(path):
+    match = re.match(r's3://([^/]+)/(.*)', path)
+    if match:
+        return match.groups()
+    else:
+        raise ValueError('Invalid S3 path')
+
+
+
 def get_timestamp_of_most_recently_created_file(path:str) -> str:
     """Return the timestamp of the most recently created file that is 
     listable at the provided path.
@@ -71,11 +79,20 @@ def get_timestamp_of_most_recently_created_file(path:str) -> str:
         ValueError: If no dates are found in the bucket.
     """
 
-    bucket, prefix = parse.parse("s3://{}/{}", path)
-    bucket = boto3.resource('s3').Bucket(bucket)
-     
+    # bucket, prefix = parse.parse("s3://{}/{}", path)
+    bucket, prefix = parse_s3_path(path)
+
+    # Get the existing Singleton
+    s3_resource = S3Resource.getInstance()
+    s3 = s3_resource.get_resource()
+    bucket = s3.Bucket(str(bucket))
+    print(f"bucket = {bucket}")
+    print(f"path = {path}")
+    print(f"prefix = {prefix}")
+    
     file_paths = [obj for obj in bucket.objects.filter(Prefix=prefix)]
     if not file_paths:
+        print(f"Prefix: {prefix}")
         raise ValueError("No files found in bucket.")
 
     dates = []
@@ -106,12 +123,12 @@ def get_lexicographically_highest_subdirectory(bucket, prefix) -> str:
     Returns:
         str: The lexicographically highest subdirectory under the prefix.
     """
-    s3 = boto3.resource('s3')
+    s3_resource = S3Resource.getInstance()
+    s3 = s3_resource.get_resource()
     bucket = s3.Bucket(str(bucket))
     
-    print(f"get_lexicographically_highest_subdirectory() is exploring {bucket}/{prefix}")
-    
     candidate_dates = []
+    print(bucket)
     for obj in bucket.objects.filter(Prefix=prefix):
         subdirs = obj.key.split('/')
         leaf = subdirs[-2:][0]
@@ -119,12 +136,9 @@ def get_lexicographically_highest_subdirectory(bucket, prefix) -> str:
             candidate_dates.append(leaf)
     try:
         most_recent = sorted(candidate_dates)[-1]
-        print(f"\tMost recent found: {most_recent}")
         return most_recent
     except IndexError:
-        print(f"No folder of parquet files found at {bucket}/{prefix}")
-        return ""
-    
+        raise IndexError(f"No folder of parquet files found at {bucket}/{prefix}")
     
     
     """Usage Notes:
