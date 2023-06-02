@@ -10,41 +10,19 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 
 def run(spark:SparkSession):
-    app_name = "creating procedure dimension table in Optimised tier"
-    print(f"{'':*^80}\nStarting application `{app_name}`...")
-
-    # READ IN
+    
+    # Read in data needed for transformations.
     claim_df:DataFrame = read_parquet_data(engine=spark, 
-                                                path=get_claim_input_path())
-
-    # Visually validate the read dataframes.
-    print("Providing a visual check for the Dataframes.\n")
-    claim_df.show(5, truncate=True)
-
-    # TRANSFORM
+                                           path=get_claim_input_path())
+    
+    # Apply transformations.  
     transformed_df = transform_data(df=claim_df)
 
-    # Visually validate the transformed dataframe.
-    print("Providing a visual check for the transformed Dataframe.\n")
-    transformed_df.show(5, truncate=True)
-
-
-    # WRITE TO FILE
+    # Write transformed data to path.
     write_path = get_procedure_dim_output_path()
-    write_data(
-        df=transformed_df, 
-        path=write_path, 
-        mode='overwrite'
-    )
-
-    # Visually validate the written dataframe.
-    written_df = spark.read.parquet(write_path)
-    print(f"Checking location dimension table written to {write_path}\n")
-    written_df.show(10, truncate=True)
-            
-    # JOB COMPLETED MESSAGE
-    print(f"Finished running `{app_name}`.")
-
+    write_data(df=transformed_df, 
+               path=write_path, 
+               mode='overwrite')
 
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])
