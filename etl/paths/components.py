@@ -55,12 +55,12 @@ class Bucket(StringEnum):
     """The path component used by the ETL pipeline in production to reference
     the S3 bucket."""
     
-    LANDING = "project-lf"
-    RAW = "project-lf"
-    ACCESS = "project-lf"
-    OPTIMISED = "project-lf"
-    TEST = "project-lf"
-    PROJECT = "project-lf"
+    LANDING = "no-bucket"
+    RAW = "no-bucket"
+    ACCESS = "no-bucket"
+    OPTIMISED = "no-bucket"
+    TEST = "no-bucket"
+    PROJECT = "no-bucket"
     
 class Tier(StringEnum):
     """"""
