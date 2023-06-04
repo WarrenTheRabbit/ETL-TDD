@@ -1,0 +1,48 @@
+## Why does this class and its static methods exist?
+A s3 resource object is created by invoking `boto3.resource('s3')`. It provides a mechanism for sending RESTful requests to AWS servers.
+### The Problem
+If every module creates its own s3 resource object, we cannot centrally control which endpoint the clients use. If the endpoint cannot be controlled, we cannot mock the s3 service by rerouting all the RESTful calls to a specialised mock server (in our case, *moto server*).
+
+### The Solution 
+We prevent modules from creating their own s3 resources by delegating the creation of s3 resource objects to the static creation methods of `S3Resource`.
+
+We control the choice of endpoint by making the first choice of endpoint irreversible. That is, if you first invoke the `getMockInstance` creation method, your code will work with a local endpoint for the entire session.
+```python
+>>> print(S3Resource.getMockInstance().meta.client._endpoint)
+s3(http://127.0.0.1:5000/)
+>>> print(S3Resource.getInstance().meta.client._endpoint)
+s3(http://127.0.0.1:5000/)
+```
+But if you first invoke the `getInstance` creation method, your code will work with an AWS endpoint.
+```python
+>>> print(S3Resource.getInstance().meta.client._endpoint)
+https://s3.use-east-1.amazonaws.com
+>>> print(S3Resource.getMockInstance().meta.client._endpoint)
+https://s3.us-east-1.amazonaws.com
+```
+
+### Design Problems
+#### Creates a dependency
+Since we create s3 resource objects using a `S3Resource.get` method, some of our modules will depend on this class (unless s3 objects are passed as parameters).
+
+#### Difficult to work with multiple endpoints
+The region of the session can be defined when the Singleton object is first created but it cannot be changed.
+
+### Next Steps
+One option is to use *dependency injection*, especially if you are convinced it is an antipattern (and not pythonic) to use a Singleton. To do this, you would refactor the code so that all methods and functions which depend on an s3 resource object can ONLY receive it as a parameter, and NEVER create one. You then control the endpoint by making explicit decisions about how many s3 resource objects to create and which methods and functions to pass them to.
+
+This:
+```python
+def get_timestamp_of_most_recently_created_file(path:str) -> str:
+    ...
+    s3 = S3Resource.getInstance()
+    bucket = s3.Bucket(str(bucket_name))
+```
+To:
+
+```python
+def get_timestamp_of_most_recently_created_file(path:str, s3_resource) -> str:
+    ...
+    bucket = s3_resource.Bucket(str(bucket_name))
+```
+
