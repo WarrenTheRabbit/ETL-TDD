@@ -1,4 +1,4 @@
-from etl.mock.infrastructure.s3_bucket import MockS3Bucket
+from etl.mock.infrastructure.mock_s3_bucket import MockS3Bucket
 import colorama
 from colorama import Fore, Style
 
@@ -8,12 +8,11 @@ colorama.init()
 def print_objects_in_bucket(message:str, mock_bucket:MockS3Bucket):
     print("*"*120)
     print(f"{Fore.MAGENTA}These objects {message} {Style.RESET_ALL}")
-    print("*"*120)
 
     objects =  mock_bucket.list_all()
     
     if objects == []:
-        print("No objects in the bucket.")
+        print("No objects in the mock bucket.\n" + "*"*120)
     
     for obj in objects:
         s3_path = f"s3://{obj.bucket_name}/{obj.key}"
