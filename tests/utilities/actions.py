@@ -7,9 +7,9 @@ class TestActions:
         self.post_test = post_test
 
 
-def get_print_bucket_contents_actions() -> TestActions:
+def get_print_s3_actions() -> TestActions:
     return TestActions(
-        pre_test=lambda mock_bucket: print_objects_in_bucket("existed before running the test.", mock_bucket),
+        pre_test=lambda mock_bucket: print_objects_in_bucket("existed before setting up the test.", mock_bucket),
         during_test=lambda mock_bucket: print_objects_in_bucket("existed immediately after running the test.", mock_bucket),
         post_test=lambda mock_bucket: print_objects_in_bucket("exist after tearing down the test.", mock_bucket),
     )
