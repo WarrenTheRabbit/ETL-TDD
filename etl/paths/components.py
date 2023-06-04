@@ -10,35 +10,9 @@ Access or Optimised), source-system orientation (from operational databases or
 integrative), table (dimension or non-dimensional), load type (full or 
 incremental), timestamp and file extension.
 
-A more advanced use case is to toggle the environment. If the Environment.PROD 
-value is used to start a path, the ETL processes will interact with S3 file 
-paths. If the Environment.DEV value is used, the ETL processes will interact 
-with a local file system instead. 
-
-Usage Examples:
-
-    A development environment demonstration.
-    >>> path = (
-    ...     f"{Environment.DEV}"
-    ...     f"{Bucket.LANDING}"
-    ...     f"{Source.CLAIM_DB}"
-    ...     f"{Table.CLAIM}"
-    ...     f"claim.csv"
-    ... )
-    >>> path
-    's3://landing/claim_db/claim/claim.csv'
-   
-    A production environment demonstration.
-    >>> path = (
-    ...     f"{Environment.PROD}"
-    ...     f"{Bucket.LANDING}"
-    ...     f"{Source.CLAIM_DB}"
-    ...     f"{Table.CLAIM}"
-    ...     f"claim.csv"
-    ... )
-    >>> path
-    's3://landing/claim_db/claim/claim.csv'
+A more advanced use case is to toggle buckets between test runs and project runs.
 """
+import os
 from enum import Enum
 from typing import Iterable, Union
 
@@ -55,12 +29,9 @@ class Bucket(StringEnum):
     """The path component used by the ETL pipeline in production to reference
     the S3 bucket."""
     
-    LANDING = "no-bucket"
-    RAW = "no-bucket"
-    ACCESS = "no-bucket"
-    OPTIMISED = "no-bucket"
-    TEST = "no-bucket"
-    PROJECT = "no-bucket"
+    MOCK = "not-real"
+    TEST = "test-lf-wm"
+    PROD = "project-lf"
     
 class Tier(StringEnum):
     """"""
@@ -115,8 +86,8 @@ class Environment(StringEnum):
     """The path component used by the ETL pipeline when a process relates to
     a specific environment type."""
     
-    PROD = "s3"
-    DEV = 'file'
+    AWS = "s3"
+    # DEV = 'file'
     
     
     
