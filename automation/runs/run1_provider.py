@@ -6,19 +6,17 @@ import etl.mock.infrastructure.buckets as project
 import etl.validation.output as validate
 import etl.jobs as jobs
 # import etl.jobs.validate.expectations.provider as provider
-import sys
-from etl.mock.infrastructure.s3_bucket import get_mock_s3_server_and_its_local_process
 
 
 def run(spark: SparkSession):
     import stage_source_into_landing
-    stage_source_into_landing.run(spark)
+    stage_source_into_landing.run(spark,env)
 
     import stage_provider_into_raw
-    stage_provider_into_raw.run(spark)
+    stage_provider_into_raw.run(spark,env)
 
     import stage_provider_into_access
-    stage_provider_into_access.run(spark)
+    stage_provider_into_access.run(spark,env)
     
 if __name__ == '__main__':
     

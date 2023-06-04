@@ -7,13 +7,13 @@ from pyspark.context import SparkContext
 
 def run(spark: SparkSession):
     import stage_source_into_landing
-    stage_source_into_landing.run(spark)
+    stage_source_into_landing.run(spark,env)
 
     import stage_policyholder_into_raw
-    stage_policyholder_into_raw.run(spark)
+    stage_policyholder_into_raw.run(spark,env)
 
     import stage_policyholder_into_access
-    stage_policyholder_into_access.run(spark)
+    stage_policyholder_into_access.run(spark,env)
     
 if __name__ == '__main__':
     

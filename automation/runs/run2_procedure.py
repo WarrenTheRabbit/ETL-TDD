@@ -11,7 +11,7 @@ import etl.jobs as jobs
 
 def run(spark: SparkSession):
     import stage_procedure_into_optimised
-    stage_procedure_into_optimised.run(spark)
+    stage_procedure_into_optimised.run(spark,env)
     
 if __name__ == '__main__':
     

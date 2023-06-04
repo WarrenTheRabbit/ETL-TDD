@@ -6,19 +6,18 @@ import etl.mock.infrastructure.buckets as project
 import etl.validation.output as validate
 import etl.jobs as jobs
 # import etl.jobs.validate.expectations.provider as provider
-import sys
-from etl.mock.infrastructure.s3_bucket import get_mock_s3_server_and_its_local_process
 
 
-def run(spark: SparkSession):
+
+def run(spark:SparkSession, test=False):
     import stage_source_into_landing
-    stage_source_into_landing.run(spark)
+    stage_source_into_landing.run(spark,env)
 
     import stage_claim_into_raw
-    stage_claim_into_raw.run(spark)
+    stage_claim_into_raw.run(spark,env)
 
     # if not validate.output(engine=spark,
-    #             path_to_dataframe=jobs.raw.provider.get_input_path(),
+    #             path_to_dataframe=jobs.raw.provider.get_input_path(env),
     #             expected_count=provider.expectations['Raw']['Count'],
     #             expected_schema=provider.expectations['Raw']['Schema'],
     #             expected_top=provider.expectations['Raw']['First Row'],
@@ -26,9 +25,9 @@ def run(spark: SparkSession):
     #             ):
     #     raise Exception('Validation failed.')
     import stage_claim_into_access
-    stage_claim_into_access.run(spark)
+    stage_claim_into_access.run(spark,env)
     # if not validate.output(engine=spark,
-    #             path_to_dataframe=jobs.access.provider.get_input_path(),
+    #             path_to_dataframe=jobs.access.provider.get_input_path(env),
     #             expected_count=provider.expectations['Access']['Count'],
     #             expected_schema=provider.expectations['Access']['Schema'],
     #             expected_top=provider.expectations['Access']['First Row'],
