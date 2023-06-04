@@ -1,0 +1,77 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "Understanding S3Resource",
+  "steps": [
+    {
+      "file": "etl/mock/infrastructure/s3_resource.py",
+      "description": "This class is a **Singleton**. There will only ever be one of it, and it is accessible globally.\n\n## Why does this class and its static methods exist?\nA Singleton is useful when you want to share a resource. In our case, we have an S3 resource object that gets created by invoking `boto3.resource('s3')`, and we want to share the underlying client's endpoint across multiple modules and methods. The endpoint provides a mechanism for sending RESTful requests to AWS's API servers, which empowers our code to make ListObject and CreateBucket requests. \n\n### The Problem\nIf we just create a new local S3 resource each time we need one, then we do not have centralised control over the endpoint used by the S3 resource's underlying client. If the endpoint cannot be controlled, we cannot mock the S3 service by choosing to route requests to a specialised mock server instead of AWS' server. If we cannot be independent of AWS' servers, then we are forced to use an AWS account, and we cannot isolate our tests or control costs.\n\n### The Solution \nWe prevent modules from creating their own S3 resources by delegating the creation of s3 resource \nobjects to the static creation methods of `S3Resource`.\n\nWe control the choice of endpoint by making the first choice of endpoint irreversible. That is, \nif you first invoke the `getMockInstance` creation method, your code will work with a local \nendpoint for the entire session.\n```python\n>>> S3Resource.getMockInstance(region_name='ap-southeast-2').meta.client._endpoint\ns3(http://127.0.0.1:5000/)\n>>> S3Resource.getInstance(region_name='ap-southeast-2').meta.client._endpoint\ns3(http://127.0.0.1:5000/)\n```\nBut if you first invoke the `getInstance` creation method, your code will work with an AWS \nendpoint instead.\n```python\n>>> S3Resource.getInstance(region_name='ap-southeast-2').meta.client._endpoint\nhttps://s3.ap-southeast-2.amazonaws.com\n>>> S3Resource.getMockInstance(region_name='ap-southeast-2').meta.client._endpoint\nhttps://s3.ap-southeast-2.amazonaws.com\n```\n\n### Issues with current design\nThe current design works for production jobs because they make use of the same resource: the S3 production server.\n\nHowever, I think I have introduced an anti-pattern that should be refactored. This section gives some of the reasons why. The biggest issue with the design is that it makes independent testing harder.\n#### Creates a dependency\nOur code expects us to control the endpoint of the s3 resource object's underlying client session. \nWe achieve that by delegating s3 resource object creation to this Singleton class, and then we write\nour code to its interface. By writing code to the Singleton's `getInstance` and `getMockInstance` \nstatic methods, we form a dependence on that interface.\n\n#### Cannot use static methods to work with different regions\nAlthough the region of the session can be defined when the Singleton object is first created (using keyword-argument passthrough), it is not possible to use the Singleton static methods interface to change regions.\n\n#### Promotes resource-sharing (but tests need resource-independence)\nExtra care must be taken to teardown the S3Resource (`S3Resource.teardown()`) when running tests, otherwise tests will produce ordering effects and will not be independent of each other.\n\n### Possible Next Steps\n#### Use dependency injection instead\nIf you refactor the code so that all methods and functions which depend on an s3 resource object only ever *receive* it as a parameter, and never *create* it, then you decouple usage from creation. To control the endpoint, you make explicit decisions outside of the methods that use them about how many s3 resource objects to create and which methods and functions to pass them to.\n\nThis:\n```python\ndef get_timestamp_of_most_recently_created_file(path:str) -> str:\n    ...\n    s3 = S3Resource.getInstance()\n    bucket = s3.Bucket(str(bucket_name))\n```\nTo:\n\n```python\ndef get_timestamp_of_most_recently_created_file(path:str, s3_resource) -> str:\n    ...\n    bucket = s3_resource.Bucket(str(bucket_name))\n```\n\nIn my opinion, this is the superior option, as it decouples classes and makes the design more testable and flexible.\n\n#### Subclass S3Resource with different regions\nA different approach is to use subclasses. For example, to solve the issue of interacting with one region only, you could define region-specific subclasses of S3Resource. \n\n#### Store s3 resource objects by region name in a dictionary \nYou could also change the `_instance` variable, which stores the only instance of a s3 resource object allowed to exist, to a dictionary of resources that can be used to retrieve region-specific resource objects.\n\n### Next Steps, New Challenges\nIf you start to use multiple local endpoints, you will need to change how `endpoint_url` is initialised by the `S3Resource` class (if still in use), and make it possible for mock servers to be created on different ports.\n\n## Technical Review\nFor more information on the Singleton pattern, see https://refactoring.guru/design-patterns/singleton.",
+      "line": 3,
+      "selection": {
+        "start": {
+          "line": 42,
+          "character": 145
+        },
+        "end": {
+          "line": 42,
+          "character": 148
+        }
+      }
+    },
+    {
+      "file": "etl/mock/infrastructure/s3_resource.py",
+      "description": "The contract you must follow is to never initialise `S3Resource` with `__init__`.\nYou also must be careful where you use `boto3.resource('s3')`. If you want to control the session to have one endpoint only, always use `S3Resource`'s creation methods. \n\nThat is, use the static methods `getInstance()` and `getMockInstance()`.\nThis makes it possible to mock the session in the global namespace.\n",
+      "line": 6
+    },
+    {
+      "file": "etl/mock/infrastructure/mock_s3_server.py",
+      "description": "This is an example of using `getMockInstance`. Use it when you want your code to use a local and mocked S3 endpoint.",
+      "line": 29
+    },
+    {
+      "file": "tests/utilities/infrastructure.py",
+      "description": "If this function is executed before any invocations of `getInstance`, the endpoint is guaranteed to be the test endpoint.",
+      "line": 18
+    },
+    {
+      "file": "tests/integration/test_run1_claim.py",
+      "description": "By wrapping our integration tests in the `with_test_server` decorator, we guarantee that `getMockInstance` is invoked before any of the `getInstance` methods in the rest of our code can be executed.",
+      "line": 11
+    },
+    {
+      "file": "etl/paths/timestamps.py",
+      "description": "For example, two of the methods in `timestamps.py` invoke `getInstance`. \n\nIf they are invoked as part of a test run, the earlier invocation of `getMockInstance` guarantees that this code will use the existing resource (which points to the mocking endpoint).\n\n",
+      "line": 79
+    },
+    {
+      "file": "stage_claim_into_raw.py",
+      "description": "If on the other hand the current program is a production run and the `get_mock_server...` function is never executed, then the line in `timestamps.py` will be the first time one of the `get` static methods has been invoked, and it will initialise an s3 resource object with an AWS endpoint.\n\nThe final steps of this tour are the execution path from this point here in the code (`stage_claim_into_raw.py`) to the first time a `get` static creation method is invoked.",
+      "line": 43
+    },
+    {
+      "file": "stage_claim_into_raw.py",
+      "description": "The function starts executing.",
+      "line": 18
+    },
+    {
+      "file": "etl/jobs/landing/claim.py",
+      "description": "`create_path` executes and the program wants the timestamp for the most recent `.csv` file at the given subdirectory.",
+      "line": 17
+    },
+    {
+      "file": "etl/paths/create.py",
+      "description": "So this condition is true and its pathway is executed.",
+      "line": 108
+    },
+    {
+      "file": "etl/paths/timestamps.py",
+      "description": "`time_requested` is not 'now' (it is 'recent') so this pathway is executed.",
+      "line": 49
+    },
+    {
+      "file": "etl/paths/timestamps.py",
+      "description": "This line is the first time one of `S3Resource`'s static creation methods has been invoked, and it is `getInstance`. \n\nThis means the s3 resource object has an underlying AWS endpoint, and that this and all future invocations of `S3Resource.getX` are guaranteed to be for that underlying production endpoint.",
+      "line": 79
+    }
+  ],
+  "description": "This tour will help you understand why S3Resource exists and how to use it."
+}
