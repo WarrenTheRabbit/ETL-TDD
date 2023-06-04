@@ -25,14 +25,14 @@ def create_path(*,
     New or existing object?
     -----------------------
     The path can be for a new or existing file or folder, depending on the 
-    values for `time_required` and `file_extension`. When `time_requested` is
+    values for `time_requested` and `file_extension`. When `time_requested` is
     'now', the path is for a new object; otherwise, the path is for an existing 
     object (the most recently created). When `file_extension` is an empty 
     string, the new or existing object is a folder; otherwise, it is a file.
     
     Value of timestamp
     ------------------
-    The timestamp added to the path depends on `time_required`.
+    The timestamp added to the path depends on `time_requested`.
     
     When `time_requested` is 'now', the timestamp takes on the value of the 
     current time.
@@ -85,18 +85,18 @@ def create_path(*,
     root = f"{environment}://{bucket}"
     prefix = f"{tier}/{source}{structure}/{load}"
     
-    # The path is then finalised by 1) adding the requested timestamp (either 
-    # the current time or the creation time of the most recently created object
-    # (file or folder, depending on `file_extension`) that is listable at the
-    # intermediary stem, and 2) by adding `file_extension` (if the path 
-    # is for a file).
+    # Finalise a return path by creating and adding the requested timestamp.
+    # The timestamp is either the current time or the creation time of the 
+    # object most recently created within a subdirectory. 
+    # The return path is a file or a folder, depending on the value of 
+    # `file_extension`.
     if time_requested == 'recent' and not file_extension:
         # The path is intended to locate the most recent folder of parquet 
         # files listable at the stem. Since the folder names are themselves 
         # timestamps, `time_requested` should be set as the lexicographically 
         # higest of the folders.
         timestamp = get_lexicographically_highest_subdirectory(
-                                                        bucket=bucket, 
+                                                        bucket=str(bucket), 
                                                         prefix=prefix)
         return f"{root}/{prefix}/{timestamp}/"
     
@@ -105,7 +105,7 @@ def create_path(*,
         # extension) that is listable at the stem. Since all file names in the 
         # ETL are timestamps, `time_requested` should be set as the stem of the 
         # most recent file's file name.
-        timestamp = get_timestamp_for_file(time_required=time_requested, 
+        timestamp = get_timestamp_for_file(time_requested=time_requested, 
                                            path=f"{root}/{prefix}")
         full_path = f"{root}/{prefix}/{timestamp}{file_extension}"
         return full_path
