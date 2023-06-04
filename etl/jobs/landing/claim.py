@@ -1,3 +1,4 @@
+from awsglue import DynamicFrame
 from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier
 from etl.paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
@@ -5,22 +6,22 @@ from pyspark.sql.types import StructType
 
 # claim_db.claim | Landing -> Raw
 
-def get_input_path():
+def get_input_path(env):
     return create_path(
-                environment=Environment.PROD,
-                bucket=Bucket.LANDING,
+                environment=Environment.AWS,
+                bucket=env,
                 tier=Tier.LANDING,
                 source=Source.CLAIM_DB,
                 table=Table.CLAIM,
                 load=Load.FULL,
                 time_requested='recent',
-                file_extension='.csv'   
+                file_extension='.csv'  
 )
 
-def get_output_path():
+def get_output_path(env):
     return create_path(
-        environment=Environment.PROD,
-        bucket=Bucket.RAW,
+        environment=Environment.AWS,
+        bucket=env,
         tier=Tier.RAW,
         source=Source.CLAIM_DB,
         table=Table.CLAIM,
@@ -43,7 +44,7 @@ def read_data(engine:SparkSession,
 def transform_data(df:DataFrame):
     return df
 
-def write_data(df:DataFrame, path:str, **kwargs):
+def write_data(df:DynamicFrame, path:str, **kwargs):
     df.write.parquet(path, **kwargs)
 
 

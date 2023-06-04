@@ -9,9 +9,10 @@ import datetime
 
 # date_dim | Creating date_dim table 
 
-output_path:str = create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
+def get_output_path(env):
+    return create_path(
+    environment=Environment.AWS,
+    bucket=env,
     tier=Tier.OPTIMISED,
     dimension=Dimension.DATE,
     load=Load.FULL,

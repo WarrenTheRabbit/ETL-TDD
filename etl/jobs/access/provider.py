@@ -8,26 +8,26 @@ from typing import List
 
 # provider_dim | Access -> Optimised
 
-def get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_location_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_location_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.LOCATION,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_provider_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_provider_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.PROVIDER,
                        load=Load.FULL,

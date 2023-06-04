@@ -6,27 +6,27 @@ from pyspark.sql.functions import monotonically_increasing_id
 
 # policyholder_dim | Access -> Optimised
 
-def get_policyholder_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_policyholder_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.POLICYHOLDER,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_location_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_location_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.LOCATION,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_policyholder_output_path():
+def get_policyholder_output_path(env):
     return create_path(
-    environment=Environment.PROD,
-    bucket=Bucket.PROJECT,
+    environment=Environment.AWS,
+    bucket=env,
     tier=Tier.OPTIMISED,
     dimension=Dimension.POLICYHOLDER,
     load=Load.FULL,

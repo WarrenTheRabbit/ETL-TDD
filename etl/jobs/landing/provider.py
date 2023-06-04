@@ -5,9 +5,9 @@ from pyspark.sql.types import StructType
 
 # claim_db.provider | Landing -> Raw
 
-def get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.LANDING,
+def get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.LANDING,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,
@@ -15,9 +15,9 @@ def get_input_path():
                        time_requested='recent',
                        file_extension='.csv')
 
-def get_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.RAW,
+def get_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.RAW,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,

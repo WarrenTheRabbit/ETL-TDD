@@ -6,50 +6,50 @@ from typing import List
 
 # claim_dim | Access -> Optimised
 
-def get_claim_access_get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_claim_access_get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.CLAIM,
                        load=Load.FULL,
                        time_requested='recent')
  
-def get_date_dim_get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_date_dim_get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.DATE,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_policyholder_dim_get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_policyholder_dim_get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.POLICYHOLDER,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_provider_dim_get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_provider_dim_get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.PROVIDER,
                        load=Load.FULL,
                        time_requested='recent') 
 
-def get_procedure_dim_get_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_procedure_dim_get_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.PROCEDURE,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_claim_fact_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_claim_fact_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        fact=Fact.CLAIM,
                        load=Load.FULL,

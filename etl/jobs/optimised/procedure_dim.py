@@ -6,9 +6,9 @@ from pyspark.sql.functions import monotonically_increasing_id
 
 # procedure_dim | Access -> Optimised
 
-def get_claim_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_claim_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.CLAIM,
@@ -16,9 +16,9 @@ def get_claim_input_path():
                        time_requested='recent'
 )
 
-def get_procedure_dim_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.OPTIMISED,
+def get_procedure_dim_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.PROCEDURE,
                        load=Load.FULL,

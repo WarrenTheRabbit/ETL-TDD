@@ -9,9 +9,9 @@ from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier,
 from etl.paths.create import create_path
 
 # A path to the claim_db.claim table data that has been staged in Raw.
-def get_input_path():
-    return create_path(environment=Environment.PROD,
-                    bucket=Bucket.RAW,
+def get_input_path(env:Bucket):
+    return create_path(environment=Environment.AWS,
+                    bucket=env,
                     tier=Tier.RAW,
                     source=Source.CLAIM_DB,
                     table=Table.CLAIM,
@@ -20,10 +20,10 @@ def get_input_path():
 )
 
 # A path for claim_db.claim table data to be staged to Access.
-def get_output_path():
+def get_output_path(env):
     return create_path(
-        environment=Environment.PROD,
-        bucket=Bucket.ACCESS,
+        environment=Environment.AWS,
+        bucket=env,
         tier=Tier.ACCESS,
         source=Source.CLAIM_DB,
         table=Table.CLAIM,

@@ -8,27 +8,27 @@ from etl.jobs.optimised.attributes import with_slowly_changing_dimensions
 
 # location_dim | Access -> Optimised
 
-def get_provider_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_provider_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_policyholder_input_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_policyholder_input_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.POLICYHOLDER,
                        load=Load.FULL,
                        time_requested='recent')
 
-def get_location_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.OPTIMISED,
+def get_location_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.OPTIMISED,
                        dimension=Dimension.LOCATION,
                        load=Load.FULL,

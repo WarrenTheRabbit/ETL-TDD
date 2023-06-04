@@ -9,9 +9,9 @@ from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier
 from etl.paths.create import create_path
 
 # A path to claim_db.provider table data that has been staged in Raw.
-def get_input_path(): 
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_input_path(env): 
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.RAW,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,
@@ -19,9 +19,9 @@ def get_input_path():
                        time_requested='recent')
 
 # A path for claim_db.provider table data to be staged to Access.
-def get_output_path():
-    return create_path(environment=Environment.PROD,
-                       bucket=Bucket.PROJECT,
+def get_output_path(env):
+    return create_path(environment=Environment.AWS,
+                       bucket=env,
                        tier=Tier.ACCESS,
                        source=Source.CLAIM_DB,
                        table=Table.PROVIDER,
@@ -83,7 +83,7 @@ def transform_data(df:DataFrame) -> DataFrame:
         # rename the 'provider_address' column to 'address'
         .withColumnRenamed('provider_address', 'address')
     )
-    return transformed_df
+    return transformed_df, write_path
 
 
 def write_data(df:DataFrame, path:str, **kwargs):
