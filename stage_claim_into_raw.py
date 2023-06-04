@@ -7,9 +7,9 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.context import SparkContext
+from etl.paths.components import Bucket
 
 from etl.validation.schemas import landing as claim_schema
-from etl.jobs.landing import claim
 from etl.jobs.landing.claim import read_data, transform_data, write_data, \
     get_input_path, get_output_path
 
@@ -24,18 +24,16 @@ def run(glueContext:GlueContext,env):
 
     # Apply transformations.  
     transformed_df:DataFrame = transform_data(read_df)
+    dynamic_frame = DynamicFrame.fromDF(transformed_df, glueContext, "transformed_dyf")
     
-    # Write transformed data to path.
+    # Write dynamic frame to path.
     write_path = get_output_path(env)
-    write_data(df=transformed_df, 
+    write_data(df=dynamic_frame, 
                path=write_path, 
                mode='overwrite') 
     
-    # Return transformed data for optional testing.
-    
-    # return as a dynamic frame
-    dynamic_frame = DynamicFrame.fromDF(transformed_df, glueContext, "transformed_dyf")
-    
+    # Return transformed data for optional testing, and write_path for 
+    # basing automation tasks on the s3 path.  
     return dynamic_frame, write_path
     
 if __name__ == '__main__':
