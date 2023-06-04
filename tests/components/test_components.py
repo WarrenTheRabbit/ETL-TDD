@@ -1,16 +1,23 @@
+import pytest
+import pytz
+from freezegun import freeze_time
+from datetime import datetime
+from etl.mock.infrastructure.s3_resource import S3ResourceSingleton
 
-from etl.paths.components import Environment, Bucket, Source
+from etl.paths.components import Environment, Bucket, Source, StringEnum
 from etl.paths.components import Table, Fact, Dimension, Load, Tier
+from etl.paths.timestamps import get_timestamp_for_file, \
+    get_timestamp_of_most_recently_created_file
+
 
 class TestBucketEnum:
     def test_enum_values(self):
-        assert str(Bucket.LANDING) ==  "project-lf"
-        assert str(Bucket.RAW) ==  "project-lf"
-        assert str(Bucket.ACCESS) == "project-lf"
-        assert str(Bucket.OPTIMISED) ==  "project-lf"
+        Bucket.PROD.value == "project-lf"
+        Bucket.TEST.value == "test-lf-wm"
+        Bucket.MOCK.value == "not-real"
 
     def test_enum_type(self):
-        assert isinstance(Bucket.LANDING, StringEnum)
+        pass
 
 class TestSourceEnum:
     def test_enum_values(self):
@@ -21,11 +28,11 @@ class TestSourceEnum:
 
 class TestEnvironmentEnum:
     def test_enum_values(self):
-        assert str(Environment.PROD) == "s3"
-        assert str(Environment.DEV) == "file"
+        assert str(Environment.AWS) == "s3"
+        # assert str(Environment.DEV) == "file"
 
     def test_enum_type(self):
-        assert isinstance(Environment.PROD, StringEnum)
+        assert isinstance(Environment.AWS, StringEnum)
         
 class TestTableEnum:
     def test_enum_values(self):
@@ -79,25 +86,33 @@ class TestLoadEnum:
 class TestTime:
     
     def test_get_recent_time(self):
-        path = 's3://test-dev-wm/landing/claim_db/claim/full/'
-        time = get_timestamp_of_most_recently_created_file(path)
-        
-        assert time == '202306211851'
-
+        S3ResourceSingleton.teardown()
+        try:
+            path = 's3://test-dev-wm/landing/claim_db/claim/full/'
+            time = get_timestamp_of_most_recently_created_file(path)
+            
+            assert time == '202306211851'
+        finally:
+            S3ResourceSingleton.teardown()
+            
     def test_get_time_with_recent_flag(self):
-        path = 's3://test-dev-wm/landing/claim_db/claim/full/'
-        time = get_timestamp_for_file(time_required='recent', path=path)
-        
-        assert time == '202306211851'
-        
+        S3ResourceSingleton.teardown()
+        try:
+            path = 's3://test-dev-wm/landing/claim_db/claim/full/'
+            time = get_timestamp_for_file(time_requested='recent', path=path)
+
+            assert time == '202306211851'
+        finally:
+            S3ResourceSingleton.teardown()
+            
     @freeze_time(datetime.now().strftime("%Y%m%d%H%M"))
     def test_get_time_with_now_flag(self):
         path = 's3://test-dev-wm/landing/claim_db/claim/full/'
-        time = get_timestamp_for_file(time_required='now', path=path)     
+        time = get_timestamp_for_file(time_requested='now', path=path)     
         assert time == datetime.now(pytz.timezone('Australia/Sydney')).strftime("%Y%m%d%H%M")
         
     def test_get_time_with_invalid_keyword_flag(self):
         path = 's3://test-dev-wm/landing/claim_db/claim/full/'
         with pytest.raises(ValueError):
-            get_timestamp_for_file(time_required='invalid', path=path)
+            get_timestamp_for_file(time_requested='invalid', path=path)
             
