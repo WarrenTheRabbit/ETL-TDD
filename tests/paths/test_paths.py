@@ -5,16 +5,18 @@ from datetime import datetime
 import itertools
 
 from freezegun import freeze_time
+from etl.mock.infrastructure.s3_resource import S3ResourceSingleton
 from etl.paths.components import StringEnum
 from etl.paths.validation import get_validity_of_path_request, \
     only_landing_tier_paths_have_extensions, \
     only_one_table_type_per_path, only_nonanalytical_table_paths_have_sources
 from etl.paths.components import Environment, Bucket, Source
 from etl.paths.components import Table, Fact, Dimension, Load, Tier
-from etl.paths.timestamps import get_lexicographically_highest_subdirectory, get_timestamp_of_most_recently_created_file, \
-    get_timestamp_for_file
+from etl.paths.timestamps import get_lexicographically_highest_subdirectory
 from etl.paths.create import create_path
 
+ENV = Bucket.TEST
+S3ResourceSingleton.teardown()
 
 class TestLexicographicallyHighest:
     pass
@@ -39,71 +41,70 @@ class TestCreatePath:
     @freeze_time(datetime.now().strftime("%Y%m%d%H%M"))                      
     @pytest.mark.usefixtures('mock_time_functions')
     def test_create_path_for_different_conditions(self):
-        now = (datetime
-                .now(pytz.timezone('Australia/Sydney'))
-                .strftime("%Y%m%d%H%M")
-        )
+        
+        now = (datetime.now(pytz.timezone('Australia/Sydney'))
+                       .strftime("%Y%m%d%H%M"))
          
         # Condition 1: has source, time = 'recent' and no file_extension.
         assert create_path(
-            environment=Environment.DEV,
-            bucket=Bucket.LANDING,
+            environment=Environment.AWS,
+            bucket=ENV,
             tier=Tier.LANDING,
             source=Source.CLAIM_DB,
             table=Table.CLAIM,
             load=Load.FULL,
             time_requested='recent'
-        ) == "file://{Bucket.PROJECT}/etl/landing/claim_db/claim/full/most_recent/"
+        ) == f"s3://{Bucket.TEST}/etl/landing/claim_db/claim/full/most_recent/"
         
         # Condition 2: no source, time = 'recent' and no file_extension.
         assert create_path(
-            environment=Environment.PROD,
-            bucket=Bucket.LANDING,
+            environment=Environment.AWS,
+            bucket=ENV,
             tier=Tier.LANDING,
             load=Load.FULL,
             time_requested='recent',
             fact=Fact.CLAIM
-        ) == "s3://landing-dev-wm/landing/claim_fact/full/most_recent/"
+        ) == f"s3://{Bucket.TEST}/etl/landing/claim_fact/full/most_recent/"
         
         # Condition 3: no source, time = 'recent' and file_extension.
         # SKIPPED - is an Invalid Condition 4
         
         # Condition 4: source, time = 'recent' and file_extension.
         assert create_path(
-            environment=Environment.PROD,
-            bucket=Bucket.PROJECT,
+            environment=Environment.AWS,
+            bucket=ENV,
             tier=Tier.LANDING,
             source=Source.CLAIM_DB,
             table=Table.POLICYHOLDER,
             load=Load.FULL,
             time_requested='recent',
             file_extension='.csv'
-        ) == "s3://project-dev-wm/landing/claim_db/policyholder/full/most_recent.csv"
+        ) == f"s3://{Bucket.TEST}/etl/landing/claim_db/policyholder/full/most_recent.csv"
         
         # Condition 5: no source, time = 'now' and not file_extension.
         assert create_path(
-            environment=Environment.DEV,
-            bucket=Bucket.PROJECT,
+            environment=Environment.AWS,
+            bucket=ENV,
             tier=Tier.OPTIMISED,
             load=Load.FULL,
             time_requested='now',
             fact=Fact.CLAIM
-        ) == f"file://project-dev-wm/optimised/claim_fact/full/{now}/"
+        ) == f"s3://{Bucket.TEST}/etl/optimised/claim_fact/full/{now}/"
         
         # Condition 6: source, time = 'now' and not file_extension.
         # SKIPPED - is an Invalid Condition 4
         
         # Condition 7: source, time = 'now' and file_extension.
         assert create_path(
-            environment=Environment.PROD,
-            bucket=Bucket.LANDING,
+            environment=Environment.AWS,
+            bucket=ENV,
             tier=Tier.LANDING,
             source=Source.CLAIM_DB,
             table=Table.PROVIDER,
             load=Load.FULL,
             time_requested='now',
             file_extension='.csv'
-        ) == f"s3://landing-dev-wm/landing/claim_db/provider/full/{now}.csv"
+        ) == f"s3://{Bucket.TEST}/etl/landing/claim_db/provider/full/{now}.csv"
                                   
 
 class TestPathValidation:
@@ -186,11 +187,13 @@ class TestGetLexicographicallyHighestSubdirectory:
     
     def test_returns_correct_subdirectory_from_test_bucket(self):
         """Tests that the correct subdirectory is returned."""
-        # setup
-        bucket = 'test-dev-wm'
-        path = 'raw/claim_db/claim/full/'
+        S3ResourceSingleton.teardown()
+        try:
+            path = 'etl/raw/claim_db/claim/full/'
+            
+            result = get_lexicographically_highest_subdirectory(str(ENV),path)
+            expected = '202306040915'
         
-        result = get_lexicographically_highest_subdirectory(bucket,path)
-        expected = '202305211852'
-        
-        assert result == expected
+            assert result == expected
+        finally:
+            S3ResourceSingleton.teardown()
