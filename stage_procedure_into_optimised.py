@@ -9,22 +9,22 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-def run(spark:SparkSession):
+def run(spark:SparkSession, env):
     
     # Read in data needed for transformations.
     claim_df:DataFrame = read_parquet_data(engine=spark, 
-                                           path=get_claim_input_path())
+                                           path=get_claim_input_path(env))
     
     # Apply transformations.  
     transformed_df = transform_data(df=claim_df)
 
     # Write transformed data to path.
-    write_path = get_procedure_dim_output_path()
+    write_path = get_procedure_dim_output_path(env)
     write_data(df=transformed_df, 
                path=write_path, 
                mode='overwrite') 
     
-    return transformed_df
+    return transformed_df, write_path
 
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -33,5 +33,5 @@ if __name__ == '__main__':
     spark = glueContext.spark_session
     job = Job(glueContext)
     job.init(args['JOB_NAME'], args)
-    run(spark)
+    run(spark,env=Bucket.PROD)
     job.commit()
