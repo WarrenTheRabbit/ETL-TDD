@@ -119,7 +119,6 @@ class DataBrew():
     
     def wait_for_job(self, job_name):
         if self.get_job_state(job_name) != 'RUNNING':
-            # print("Job is", self.get_job_state(job_name))
             return
         
         print('Waiting for job to finish.', end='')
@@ -152,7 +151,6 @@ class DataBrew():
         # Get path
         bucket, key = location['Bucket'], location['Key']
         result = bucket, key
-        # print("get_profile_path:", result)
         return bucket,key
     
     
@@ -195,7 +193,6 @@ class DataBrew():
             identifier = '-'.join([path[4],path[6]])
             result = f"{env}-{identifier}"
             
-        print("create_dataset_name():", result)
         return result
 
     def get_bucket_name(self,path):
@@ -206,7 +203,6 @@ class DataBrew():
         bucket = path[2]
         
         result = bucket   
-        print("get_bucket_name():", result)
         return result
     
     
@@ -224,7 +220,7 @@ class DataBrew():
         else:
             table = path[6]
             result = f"{tier}_{table}"
-        print("create_table_name():", result)
+
         return result
     
     
@@ -242,7 +238,6 @@ class DataBrew():
             table = path[6]
             result = f"{env}-{tier}-{table}"
             
-        print("create_job_name():", result)
         return result
 
 
