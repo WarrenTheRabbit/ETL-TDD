@@ -67,7 +67,7 @@ class GlueWrapper:
                 for path 
                 in path_list]
                         
-            example_path = s3_targets[0]['Path']
+            example_path = s3_targets[-1]['Path']
             name = self.create_crawler_name(example_path)
             db_name = self.create_db_name(example_path)
             table_prefix = self.create_table_prefix(example_path)
@@ -182,7 +182,8 @@ class GlueWrapper:
             self.glue_client.delete_crawler(Name=name)
         except ClientError as err:
             logger.error(
-                f"Couldn't delete crawler. {err.response['Error']['Message']}")
+                f"""Couldn't delete crawler:
+                {err.response['Error']['Message']}""")
         
     def get_database(self, name):
         """
