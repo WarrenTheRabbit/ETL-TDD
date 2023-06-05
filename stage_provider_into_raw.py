@@ -5,6 +5,7 @@ transforms it and writes it to the raw tier.
 """
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.landing.provider import get_input_path, get_output_path
+from etl.paths.components import Bucket
 from etl.validation.schemas import landing as schema
 from etl.jobs.landing.provider import read_data, transform_data, write_data
 
