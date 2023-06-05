@@ -44,7 +44,7 @@ def read_data(engine:SparkSession,
 def transform_data(df:DataFrame):
     return df
 
-def write_data(df:DynamicFrame, path:str, **kwargs):
+def write_data(df:DataFrame, path:str, **kwargs):
     df.write.parquet(path, **kwargs)
 
 
