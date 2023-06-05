@@ -216,10 +216,10 @@ class DataBrew():
         
         if 'optimised' in path:
             table = path[5]        
-            result = f"{tier}{table}"   
+            result = f"{tier}-{table}"   
         else:
             table = path[6]
-            result = f"{tier}_{table}"
+            result = f"{tier}-{table}"
 
         return result
     
