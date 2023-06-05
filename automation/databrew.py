@@ -1,6 +1,10 @@
 import boto3
 import json
 import time
+import logging
+from botocore.exceptions import ClientError
+
+logger = logging.getLogger(__name__)
 
 class DataBrew():
     """
@@ -18,22 +22,28 @@ class DataBrew():
         
         After a dataset has been created, it can be used to create a profile job.
         """
-        # Define the catalog configuration
-        input_config = {
-            'DataCatalogInputDefinition': 
-                {
-                    'CatalogId': '618572314333',
-                    'DatabaseName': database,
-                    'TableName': self.create_table_name(path)
-                }
-        }
+        try:
+            # Define the catalog configuration
+            input_config = {
+                'DataCatalogInputDefinition': 
+                    {
+                        'CatalogId': '618572314333',
+                        'DatabaseName': database,
+                        'TableName': self.create_table_name(path)
+                    }
+            }
+            
+            response = self.client.create_dataset(
+                Name=self.create_dataset_name(path),
+                Input=input_config
+            )
+            return response
         
-        response = self.client.create_dataset(
-            Name=self.create_dataset_name(path),
-            Input=input_config
-        )
-
-        return response
+        except ClientError as err:
+            logger.error(
+                f"""Couldn't create dataset:
+                {err.response['Error']['Message']}""")
+        
 
 
     def create_profile_job(self, path, key='dataquality'):
@@ -42,21 +52,24 @@ class DataBrew():
         
         After the job has been created, it can be run using its name.
         """
-        output_config = {
-                'Bucket': self.get_bucket_name(path),
-                'Key': key
-        }
+        try:
+            output_config = {
+                    'Bucket': self.get_bucket_name(path),
+                    'Key': key
+            }
+            
+            response = self.client.create_profile_job(
+                DatasetName=self.create_dataset_name(path),
+                Name=self.create_job_name(path),
+                OutputLocation=output_config,
+                RoleArn='arn:aws:iam::618572314333:role/DataBrew-Data-Quality-Workflows-DataAccessRole-ZRAZ5RGWCQW0'
+            )
+            return response
         
-        response = self.client.create_profile_job(
-            DatasetName=self.create_dataset_name(path),
-            Name=self.create_job_name(path),
-            OutputLocation=output_config,
-            RoleArn='arn:aws:iam::618572314333:role/DataBrew-Data-Quality-Workflows-DataAccessRole-ZRAZ5RGWCQW0'
-        )
-        
-        return response
-        
-        
+        except ClientError as err:
+            logger.error(
+                f"""Couldn't create data profile job:
+                {err.response['Error']['Message']}""")
     def start_job_run(self, path):
         """
         Start a job run for a given job name.
@@ -64,27 +77,44 @@ class DataBrew():
         After the job run has completed, the results can be retrieved from the
         S3 bucket.
         """
-        response = self.client.start_job_run(
-            Name=self.create_job_name(path)
-        )
-        return response
+        try: 
+            response = self.client.start_job_run(
+                Name=self.create_job_name(path)
+            )
+            return response
+        
+        except ClientError as err:
+            logger.error(
+                f"Couldn't start profile job run:\n\t{err.response['Error']['Message']}")
     
+    def show_data_profile_link(self, path):
+        print(f"You can view the data profile for {path} here:\n\t{self.get_profile_link(path)}")
     
     def get_job_state(self, path):
         """
         Return the state of a given job name.
         """
-        response = self.client.list_job_runs(Name=self.create_job_name(path))
-        result = response['JobRuns'][0]['State']
-        return result
+        try:
+            response = self.client.list_job_runs(Name=self.create_job_name(path))
+            result = response['JobRuns'][0]['State']
+            return result
+        
+        except ClientError as err:
+            logger.error(
+                f"Couldn't get job state:\n\t{err.response['Error']['Message']}")
         
         
     def delete_job(self, path):
         """
         Delete a job.
         """
-        response = self.client.delete_job(Name=self.create_job_name(path))
-        return response
+        try:
+            response = self.client.delete_job(Name=self.create_job_name(path))
+            return response
+        
+        except ClientError as err:
+            logger.error(
+                f"Couldn't create dataset:\n\t{err.response['Error']['Message']}")
         
     
     def wait_for_job(self, job_name):
@@ -104,6 +134,7 @@ class DataBrew():
             else:
                 print('.', end='')
         
+        print()
 
     
     def get_path_to_profile_file(self,path, key='dataquality'):
@@ -156,10 +187,15 @@ class DataBrew():
     def create_dataset_name(self, path):
         path = path.replace('_', '-').split("/")
         env = path[2].split('-')[0]
-        identifier = '-'.join([path[4],path[6]])
-        result = f"{env}-{identifier}"
         
-        # print("create_dataset_name", result)
+        if 'optimised' in path:
+            identifier = '-'.join([path[4],path[5]])
+            result = f"{env}-{identifier}"
+        else:
+            identifier = '-'.join([path[4],path[6]])
+            result = f"{env}-{identifier}"
+            
+        print("create_dataset_name():", result)
         return result
 
     def get_bucket_name(self,path):
@@ -170,7 +206,7 @@ class DataBrew():
         bucket = path[2]
         
         result = bucket   
-        # print("create_table_name:", result)
+        print("get_bucket_name():", result)
         return result
     
     
@@ -182,8 +218,13 @@ class DataBrew():
         tier = path[4]
         table = path[6]
         
-        result = f"{tier}{table}"   
-        # print("create_table_name:", result)
+        if 'optimised' in path:
+            table = path[5]        
+            result = f"{tier}{table}"   
+        else:
+            table = path[6]
+            result = f"{tier}_{table}"
+        print("create_table_name():", result)
         return result
     
     
@@ -191,14 +232,18 @@ class DataBrew():
         """
         Create the job name for the DataBrew profile job.
         """
-        path = path.split("/")
+        path = path.replace('_', '-').split("/")
         env = path[2].split('-')[0]
         tier = path[4]
-        table = path[6]
-  
-        result = f"{env}-{tier}-{table}"   
-        # print("create_job_name():", result)
+        if 'optimised' in path:
+            table = path[5]
+            result = f"{env}-{tier}-{table}"
+        else:
+            table = path[6]
+            result = f"{env}-{tier}-{table}"
+            
+        print("create_job_name():", result)
         return result
 
-    
+
    
