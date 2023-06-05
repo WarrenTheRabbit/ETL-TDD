@@ -24,7 +24,7 @@ def run(spark:SparkSession, env):
                path=get_output_path(env), 
                mode='overwrite') 
     
-    return spark_df, write_path
+    return spark_df
 
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])
