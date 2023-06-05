@@ -78,7 +78,7 @@ class GlueWrapper:
                 DatabaseName=db_name,
                 TablePrefix=table_prefix,
                 Targets={'S3Targets': s3_targets})
-            
+            print(f"Created crawler {self.create_crawler_name(example_path)}.")
             return response
         except ClientError as err:
             logger.error(
