@@ -83,7 +83,7 @@ def transform_data(df:DataFrame) -> DataFrame:
         # rename the 'provider_address' column to 'address'
         .withColumnRenamed('provider_address', 'address')
     )
-    return transformed_df, write_path
+    return transformed_df
 
 
 def write_data(df:DataFrame, path:str, **kwargs):
