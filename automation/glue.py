@@ -49,7 +49,7 @@ class GlueWrapper:
 
 
 
-    def create_crawler(self, path):
+    def create_crawler(self, paths):
         """
         Creates a crawler.
         
@@ -57,17 +57,27 @@ class GlueWrapper:
         AWS Glue Data Catalog with metadata.
         """
         try:
-            s3_target = self.create_crawler_path(path)
-            name = self.create_crawler_name(path)
-            db_name = self.create_db_name(path)
-            table_prefix = self.create_table_prefix(path)
+            if isinstance(paths, str):
+                path_list = [paths]
+            else:
+                path_list = paths
+                
+            s3_targets = [
+                {'Path':self.create_crawler_path(path)}
+                for path 
+                in path_list]
+                        
+            example_path = s3_targets[0]['Path']
+            name = self.create_crawler_name(example_path)
+            db_name = self.create_db_name(example_path)
+            table_prefix = self.create_table_prefix(example_path)
             
             response = self.glue_client.create_crawler(
                 Name=name,
                 Role=self.crawler_role,
                 DatabaseName=db_name,
                 TablePrefix=table_prefix,
-                Targets={'S3Targets': [{'Path': s3_target}]})
+                Targets={'S3Targets': s3_targets})
             
             return response
         except ClientError as err:
@@ -91,28 +101,20 @@ class GlueWrapper:
                 f"Couldn't start crawler. {err.response['Error']['Message']}")
 
 
-
-    
-
-
-
-
-
-
-    # ----------------------------------------------------------------------------
-    # GLUE EXTRACTING INFORMATION UTILITIES
-    # ----------------------------------------------------------------------------
     def create_crawler_path(self,path) -> str:
+        """
+        Returns the path to be crawled by the crawler.
+        """
+        
         path = path.split('/')
-        path = '/'.join(path[:path.index('claim_db')])
-        return path
+        if 'optimised' in path:
+            return '/'.join(path[:path.index('etl')+3]) 
+        else:
+            return '/'.join(path[:path.index('etl')+4]) 
+        
+        
+       
     
-    
-    def create_table_name(self,path):
-        """
-        Get the table name for the DataBrew profile job.
-        """
-        return f"{path['tier']}{path['table']}"
     
     def create_crawler_name(self, path) -> str:
         """
@@ -123,6 +125,8 @@ class GlueWrapper:
         tier = path[4]
         return f"{bucket}-{tier}"
     
+    
+    
     def create_db_name(self, path, db_name='release-3') -> str:
         """
         Get the database for the crawler.
@@ -130,6 +134,8 @@ class GlueWrapper:
         path = path.split('/')
         env = path[2].split('-')[0]
         return f"{env}-{db_name}" 
+    
+    
     
     def create_table_prefix(self, path):
         """
@@ -139,6 +145,8 @@ class GlueWrapper:
         tier = path[4]
         return tier
 
+
+
     def wait_for_crawler(self, path):
         if self.get_crawler_state(path) != 'RUNNING':
             print("Crawler not running.")
@@ -146,16 +154,22 @@ class GlueWrapper:
         
         print('Waiting for crawler to finish.', end='')
         start = time.time()
-        while self.get_crawler_state(path) == 'RUNNING':
-            # Calculate how much time has passed.
-            time.sleep(5)
-            finish = time.time() - start
-            
-            # Avoid infinite loop by timing out crawler after 2 minutes.
-            if int(finish) > 180:
-                raise Exception('Crawler timed out.')
-            else:
-                print('.', end='')
+        try:
+            while self.get_crawler_state(path) == 'RUNNING':
+                # Calculate how much time has passed.
+                time.sleep(5)
+                finish = time.time() - start
+                
+                # Avoid infinite loop by timing out crawler after 2 minutes.
+                if int(finish) > 60 * 4:
+                    print()
+                    raise Exception('Crawler timed out.')
+                else:
+                    print('.', end='')
+            print()
+        except Exception as err:
+            logger.error(
+                f"Couldn't wait for crawler. 4 minutes elapsed.")
         
         
     def delete_crawler(self, path):
@@ -166,6 +180,7 @@ class GlueWrapper:
         try:
             name = self.create_crawler_name(path)
             self.glue_client.delete_crawler(Name=name)
+        except ClientError as err:
             logger.error(
                 f"Couldn't delete crawler. {err.response['Error']['Message']}")
         
