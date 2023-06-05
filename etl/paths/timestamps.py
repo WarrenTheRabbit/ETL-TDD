@@ -117,7 +117,7 @@ def get_lexicographically_highest_subdirectory(bucket:str, prefix) -> str:
     """
     s3 = S3ResourceSingleton.getInstance()
     bucket = s3.Bucket(bucket)
-    print(bucket, prefix)
+
     candidate_dates = []
     for obj in bucket.objects.filter(Prefix=prefix):
         subdirs = obj.key.split('/')
