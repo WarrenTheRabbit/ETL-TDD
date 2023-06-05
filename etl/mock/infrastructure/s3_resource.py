@@ -9,8 +9,7 @@ class S3ResourceSingleton:
         """
         # Guarantee that `region_name` is set by defaulting to 'us-east-1'.
         region_name = kwargs.get('region_name','us-east-1') 
-        kwargs['region_name'] = region_name 
-        print(f"kwargs is {kwargs}")
+        kwargs['region_name'] = region_name
         
         if is_mock:
             S3ResourceSingleton._instance = boto3.resource("s3",
