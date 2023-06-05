@@ -90,7 +90,7 @@ def transform_data(df:DataFrame) -> DataFrame:
                 .otherwise(F.col("gender"))
         )
     )
-    return transformed_df, write_path
+    return transformed_df
 
 
 def write_data(df:DataFrame, path:str, **kwargs):
