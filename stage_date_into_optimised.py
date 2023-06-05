@@ -20,11 +20,12 @@ def run(spark:SparkSession, env):
     spark_df = transform_from_pandas_to_spark_dataframe(spark, read_df)
 
     # Write transformed data to path.
+    write_path = get_output_path(env)
     write_data(df=spark_df, 
-               path=get_output_path(env), 
+               path=write_path, 
                mode='overwrite') 
     
-    return spark_df
+    return spark_df, write_path
 
 if __name__ == '__main__':
     args = getResolvedOptions(sys.argv, ['JOB_NAME'])
