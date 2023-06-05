@@ -8,7 +8,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-def run(spark,env)
+def run(spark,env):
     
     # Run 3 starts here.
     df = stage_policyholder_into_optimised.run(spark,env)
