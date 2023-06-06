@@ -20,3 +20,5 @@ class Redshift:
         # 'optimised' in its path.
         self.loads += [job for job in batch if 'optimised' in job.path]                
         
+    def get_copy_commands(self):
+        return [Redshift.create_copy_statement(job.path) for job in self.loads]
