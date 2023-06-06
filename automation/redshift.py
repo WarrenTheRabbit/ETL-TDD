@@ -15,10 +15,15 @@ class Redshift:
     IAM_ROLE 'arn:aws:iam::618572314333:role/service-role/AmazonRedshift-CommandsAccessRole-20230513T114656'
     FORMAT AS PARQUET;"""
     
-    def filter_batch_for_redshift_loads(self, batch:List):
+    def get_any_redshift_loads(self, batch:List):
         # A job in a batch should be loaded into Redshift if it contains 
         # 'optimised' in its path.
-        self.loads += [job for job in batch if 'optimised' in job.path]                
+        self.loads += [(df,path) 
+                       for (df,path) 
+                       in batch 
+                       if 'optimised' in path]                
         
     def get_copy_commands(self):
-        return [Redshift.create_copy_statement(job.path) for job in self.loads]
+        return [Redshift.create_copy_statement(path) 
+                for (_,path)
+                in self.loads]
