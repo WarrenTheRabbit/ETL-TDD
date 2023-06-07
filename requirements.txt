@@ -1,0 +1,5 @@
+boto3
+parse
+holidays
+redshift_connector
+python-dotenv
