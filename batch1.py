@@ -34,14 +34,14 @@ def main(**config):
     
     # Use Databrew to profile the cataloged data at each S3 location.
     databrew.profile_S3_locations(batch.paths)
-    
-    # Send SNS emails.
+        
+    # Send a notification for each data profile that was created.
     for path in batch.paths:
-        # Send a link to data profile.
         databrew.sns.publish(path)
-       
-        # Send SQL statement if data needs to be staged to Redshift.
-        redshift.sns.publish(path)
+    
+    # If any data needs to be staged to Redshift, send DDL statements as a
+    # notification.
+    redshift.sns.publish(batch.paths)
    
     
 if __name__ == "__main__":
