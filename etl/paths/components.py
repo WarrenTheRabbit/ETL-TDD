@@ -30,8 +30,8 @@ class Bucket(StringEnum):
     the S3 bucket."""
     
     MOCK = "not-real"
-    TEST = "test-lf-wm"
-    PROD = "project-lf"
+    TEST = "test-lf-ap"
+    PROD = "test-lf-ap"
     
 class Tier(StringEnum):
     """"""
