@@ -50,13 +50,13 @@ class SNS:
             message = self.format_message(message)
 
         if message:
-            logging.info("There are tables that need to be staged to Redshift.")
+            logging.info("Information was published.")
             self.client.publish(
                 TargetArn = self.topic_arn,
                 Message = message,
                 Subject = subject)
             
-        logging.info(f"Nothing needs to be staged to Redshift.")
+        logging.info(f"No information was published.")
         
     def format_message(self, messages: list) -> str:
         return "\n\n".join(messages)
