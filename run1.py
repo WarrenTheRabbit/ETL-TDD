@@ -13,7 +13,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-def run(spark,env)
+def run(spark,env):
     
     stage_policyholder_into_raw.run(spark,env)
     stage_policyholder_into_access.run(spark,env)
