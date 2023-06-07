@@ -1,3 +1,5 @@
+from automation.batch import Batch
+
 def get_batch(**config):
     
    return Batch([
