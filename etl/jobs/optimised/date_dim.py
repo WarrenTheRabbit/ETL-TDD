@@ -81,18 +81,19 @@ def create_date_dimension() -> pd.DataFrame:
 
 
 def transform_from_pandas_to_spark_dataframe(
-            engine:SparkSession,
-            panda_df:pd.DataFrame) -> DataFrame:
+            spark:SparkSession,
+            panda_df:pd.DataFrame,
+            schema) -> DataFrame:
+
 
     # Create a spark dataframe from the pandas dataframe.
-    spark_df = (engine
-        .createDataFrame(panda_df)
-        # Ensure `date` column is a yyyy-MM-dd natural key.
-        .withColumn("date", F.date_format("date", "yyyy-MM-dd"))
+    spark_df = (spark
+                .createDataFrame(panda_df,schema=schema)
+                # Ensure `date` column is a yyyy-MM-dd natural key.
+                .withColumn("date", F.date_format("date", "yyyy-MM-dd"))
     )
-    transformed_df =  spark_df.withColumn("policyholder_dim_id", F.lit(None).cast("bigint"))
     
-    return with_slowly_changing_dimensions(transformed_df)
+    return with_slowly_changing_dimensions(spark_df)
 
 def write_data(df:DataFrame, path:str, **kwargs):
     df.write.parquet(path, **kwargs)
