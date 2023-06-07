@@ -1,4 +1,3 @@
-import logging
 import sys
 
 from awsglue.transforms import *
@@ -12,7 +11,7 @@ from automation.glue import Glue
 from automation.databrew import DataBrew
 
 from etl.paths.components import Bucket
-from etl.batches import batch1 as batch_definition
+from etl.batches import batch3 as batch_definition
 
 # Initialise classes to automate interactions with AWS services.
 redshift = Redshift()
@@ -24,7 +23,7 @@ def main(**config):
     This function is the entry point for the AWS Glue job.
     """
     # Run the current batch.
-    batch =  batch_definition.get_batch(**config)
+    batch = batch_definition.get_batch(**config)
     batch.run()
     
     # Use Glue to crawl and catalog all S3 locations in output.
@@ -58,5 +57,3 @@ if __name__ == "__main__":
     job.init(args['JOB_NAME'], args)
     main(**config)
     job.commit()
-    
-    logging.info("Batch completed.")
