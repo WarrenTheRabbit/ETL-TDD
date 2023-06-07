@@ -12,12 +12,12 @@ import etl.jobs.access.provider
 
 expectations = {
     'Landing': {
-        'Path': etl.jobs.landing.provider.output_path,
+        'Path': etl.jobs.landing.provider.get_output_path(env),
         'Count': 20,
         'Schema': "schema"
     },
     'Raw': {
-        'Path': etl.jobs.raw.provider.get_input_path(),
+        'Path': etl.jobs.raw.provider.get_input_path(env),
         'Count': 5,
         'Schema': StructType(
                     [StructField('provider_id', IntegerType(), True), 
@@ -45,7 +45,7 @@ expectations = {
                     provider_license_number='59185011')
     },
     'Access': {
-        'Path': etl.jobs.access.provider.provider_dimension_output_path,
+        'Path': etl.jobs.access.provider.get_provider_output_path(env),
         'Count': 5,
         'Schema': StructType(
                     [StructField('provider_id', IntegerType(), True), 
@@ -73,7 +73,7 @@ expectations = {
                     provider_license_number='59185011')
     },
         'Optimised': {
-        'Path': etl.jobs.access.provider.provider_dimension_output_path,
+        'Path': etl.jobs.access.provider.get_provider_output_path(env),
         'Count': 5,
         'Schema': StructType(
                     [StructField('provider_id', IntegerType(), True), 
