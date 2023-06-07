@@ -12,9 +12,7 @@ incremental), timestamp and file extension.
 
 A more advanced use case is to toggle buckets between test runs and project runs.
 """
-import os
 from enum import Enum
-from typing import Iterable, Union
 
 class StringEnum(Enum):
     """A convenience class that provides its subclasses with a __str__ method
@@ -31,7 +29,7 @@ class Bucket(StringEnum):
     
     MOCK = "not-real"
     TEST = "test-lf-ap"
-    PROD = "test-lf-ap"
+    PROD = "test-project-wm"
     
 class Tier(StringEnum):
     """"""
