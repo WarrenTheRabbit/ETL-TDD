@@ -4,7 +4,7 @@ import time
 import logging
 from botocore.exceptions import ClientError
 
-from automation.sns import SNS
+from aws.sns import SNS
 
 logger = logging.getLogger(__name__)
 

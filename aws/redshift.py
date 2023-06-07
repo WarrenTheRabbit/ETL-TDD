@@ -1,5 +1,5 @@
-from automation.glue import Glue
-from automation.sns import SNS
+from aws.glue import Glue
+from aws.sns import SNS
 from datetime import datetime
 
 class Redshift:
