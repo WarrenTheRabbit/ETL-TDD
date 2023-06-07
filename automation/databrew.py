@@ -4,6 +4,8 @@ import time
 import logging
 from botocore.exceptions import ClientError
 
+from automation.sns import SNS
+
 logger = logging.getLogger(__name__)
 
 class DataBrew():
@@ -13,7 +15,22 @@ class DataBrew():
     
     def __init__(self, region_name):
         self.client = boto3.client('databrew', region_name=region_name)
+        self.sns = SNS(subject="DataBrew profile has finished for '{ }'.",
+                       message="View link at { }.",
+                       message_writer = self.get_profile_link,
+                       subject_writer= self.create_dataset_name)
+      
+      
+    def profile_S3_locations(self, paths):  
+        representative_path = paths[-1]
         
+        for path in paths.paths:
+            self.create_dataset(path)
+            self.create_profile_job(path)        
+            self.start_job_run(path)
+
+        self.wait_for_job(representative_path)
+
     
     def create_dataset(self, path, database='test-release-3', CatalogId='618572314333'):
         """
@@ -37,6 +54,8 @@ class DataBrew():
                 Name=self.create_dataset_name(path),
                 Input=input_config
             )
+            print(f"Created dataset '{self.create_dataset_name(path)}'.")
+            
             return response
         
         except ClientError as err:
@@ -159,7 +178,7 @@ class DataBrew():
         Return the link to the profile page for a given dataset.
         """
         dataset = self.create_dataset_name(path)
-        return f"https://us-east-1.console.aws.amazon.com/databrew/home?region=us-east-1#dataset-details?dataset={dataset}&tab=profile-overview"
+        return f"https://ap-southeast-2.console.aws.amazon.com/databrew/home?region=ap-southeast-2#dataset-details?dataset={dataset}&tab=profile-overview"
     
     
 
@@ -172,7 +191,7 @@ class DataBrew():
         
         bucket,key = self.get_path_to_profile_file(path)
         
-        s3_resource = boto3.resource('s3', region_name='us-east-1')
+        s3_resource = boto3.resource('s3', region_name='ap-southeast-2')
         s3_object = s3_resource.Object(bucket, key)
         dq_results = s3_object.get()["Body"].read().decode("utf-8")
         dict_results = json.loads(dq_results)
