@@ -21,10 +21,11 @@ class DataBrew():
                        subject_writer= self.create_dataset_name)
       
       
-    def profile_S3_locations(self, paths):  
+    def profile_S3_locations(self, paths): 
+        print(paths) 
         representative_path = paths[-1]
         
-        for path in paths.paths:
+        for path in paths:
             self.create_dataset(path)
             self.create_profile_job(path)        
             self.start_job_run(path)
@@ -89,6 +90,8 @@ class DataBrew():
             logger.error(
                 f"""Couldn't create data profile job:
                 {err.response['Error']['Message']}""")
+            
+            
     def start_job_run(self, path):
         """
         Start a job run for a given job name.
@@ -105,6 +108,7 @@ class DataBrew():
         except ClientError as err:
             logger.error(
                 f"Couldn't start profile job run:\n\t{err.response['Error']['Message']}")
+            logger.error(path)
     
     def show_data_profile_link(self, path):
         print(f"You can view the data profile for {path} here:\n\t{self.get_profile_link(path)}")
@@ -247,6 +251,7 @@ class DataBrew():
         """
         Create the job name for the DataBrew profile job.
         """
+        print(f"Creating job name for {path}")
         path = path.replace('_', '-').split("/")
         env = path[2].split('-')[0]
         tier = path[4]
@@ -256,7 +261,7 @@ class DataBrew():
         else:
             table = path[6]
             result = f"{env}-{tier}-{table}"
-            
+        print(f"Job name is {result}")
         return result
 
 
