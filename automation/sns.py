@@ -1,3 +1,4 @@
+import logging
 import boto3
 from datetime import datetime
 import pytz
@@ -47,17 +48,15 @@ class SNS:
         
         if isinstance(message, list):
             message = self.format_message(message)
-                
-        print(message)
-        print(subject)
 
-        if message != "{ }":
-            print("publishing.")    
+        if message:
+            logging.info("There are tables that need to be staged to Redshift.")
             self.client.publish(
                 TargetArn = self.topic_arn,
                 Message = message,
-                Subject = subject
-            )
+                Subject = subject)
+            
+        logging.info(f"Nothing needs to be staged to Redshift.")
         
     def format_message(self, messages: list) -> str:
         return "\n\n".join(messages)
