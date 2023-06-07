@@ -1,21 +1,14 @@
-# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
-# SPDX-License-Identifier: Apache-2.0
-
-"""
-Purpose
-
-Shows how to use the AWS SDK for Python (Boto3) with AWS Glue to
-create and manage crawlers, databases, and jobs.
-"""
+from typing import List
 import boto3
 import logging
 import time
+import os
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)
   
 
-class GlueWrapper:
+class Glue:
     """Encapsulates AWS Glue actions."""
     def __init__(self, region_name):
         """
@@ -23,6 +16,18 @@ class GlueWrapper:
         """
         self.glue_client = boto3.client('glue', region_name=region_name)
         self.crawler_role = "arn:aws:iam::618572314333:role/service-role/AWSGlueServiceRole-ETL"
+
+    def catalog_S3_locations(self, paths:List):
+        representative_path = paths[0]
+        
+        # Delete the outdated crawler.
+        self.delete_crawler(representative_path)
+
+        # Crawl each data source with new crawler.
+        self.create_crawler(paths)
+        self.start_crawler(representative_path)
+
+        self.wait_for_crawler(representative_path)
 
 
     def get_crawler_state(self, path):
@@ -58,6 +63,7 @@ class GlueWrapper:
         """
         try:
             if isinstance(paths, str):
+                # Convert the string to a 1-element list.
                 path_list = [paths]
             else:
                 path_list = paths
@@ -78,7 +84,8 @@ class GlueWrapper:
                 DatabaseName=db_name,
                 TablePrefix=table_prefix,
                 Targets={'S3Targets': s3_targets})
-            print(f"Created crawler {self.create_crawler_name(example_path)}.")
+            print(f"Created crawler '{self.create_crawler_name(example_path)}'.")
+            time.sleep(3)
             return response
         except ClientError as err:
             logger.error(
@@ -112,9 +119,8 @@ class GlueWrapper:
         else:
             return '/'.join(path[:path.index('etl')+4]) 
         
-        
-       
-    
+    def get_crawler_name(self, path):
+        return self.create_crawler_name(path)
     
     def create_crawler_name(self, path) -> str:
         """
@@ -142,7 +148,7 @@ class GlueWrapper:
         Get the prefix for the database.
         """
         path = path.split('/')
-        tier = path[4]
+        tier = path[4] + '-'
         return tier
 
 
@@ -161,7 +167,7 @@ class GlueWrapper:
                 finish = time.time() - start
                 
                 # Avoid infinite loop by timing out crawler after 2 minutes.
-                if int(finish) > 60 * 4:
+                if int(finish) > 60 * 5:
                     print()
                     raise Exception('Crawler timed out.')
                 else:
@@ -169,7 +175,7 @@ class GlueWrapper:
             print()
         except Exception as err:
             logger.error(
-                f"Couldn't wait for crawler. 4 minutes elapsed.")
+                f"Couldn't wait for crawler. 5 minutes elapsed.")
         
         
     def delete_crawler(self, path):
@@ -178,7 +184,7 @@ class GlueWrapper:
 
         """
         try:
-            name = self.create_crawler_name(path)
+            name = self.get_crawler_name(path)
             self.glue_client.delete_crawler(Name=name)
         except ClientError as err:
             logger.error(
