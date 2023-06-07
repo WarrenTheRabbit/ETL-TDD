@@ -73,6 +73,7 @@ def transform_data(provider:DataFrame, policyholder:DataFrame):
                     "location_key",
                     "address",
                     "street",
+                    "state",
                     "postcode",
                     "suburb")
     )
