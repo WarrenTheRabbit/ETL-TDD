@@ -3,8 +3,8 @@ import numpy as np
 
 class Batch:
         
-    def __init__(self, batch:List, **kwargs):
-        self.jobs = batch
+    def __init__(self, jobs:List, **kwargs):
+        self.jobs = jobs
         self.output = None
         self.paths = None
         self.dfs = None
