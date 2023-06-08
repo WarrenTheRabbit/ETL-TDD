@@ -1,4 +1,4 @@
-from etl.mock.infrastructure.mock_s3_bucket import MockS3Bucket
+from mock.infrastructure.mock_s3_bucket import MockS3Bucket
 import colorama
 from colorama import Fore, Style
 

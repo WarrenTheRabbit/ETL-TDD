@@ -1,0 +1,22 @@
+from pyspark.sql.types import StructType, StructField, IntegerType, StringType, ShortType, LongType, DateType, BooleanType
+
+DATE:StructType = StructType([StructField('date_key', LongType(), True),
+                              StructField('date', StringType(), True),
+                              StructField('day_of_week', LongType(), True),
+                              StructField('day_name', StringType(), True),
+                              StructField('day_of_month', LongType(), True),
+                              StructField('day_of_year', LongType(), True),
+                              StructField('week_of_year', LongType(), True),
+                              StructField('month', LongType(), True),
+                              StructField('month_name', StringType(), True),
+                              StructField('quarter', LongType(), True),
+                              StructField('year', LongType(), True),
+                              StructField('is_weekend', BooleanType(), True),
+                              StructField('is_weekday', BooleanType(), True),
+                              StructField('is_holiday', BooleanType(), True),
+                              StructField('track_hash', LongType(), True),
+                              StructField('record_start_ts', StringType(), False),
+                              StructField('record_end_ts', StringType(), False),
+                              StructField('record_active_flag', ShortType(), False),
+                              StructField('record_upd_ts', StringType(), False),
+                              StructField('record_insert_ts', StringType(), False)])

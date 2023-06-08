@@ -2,7 +2,6 @@ from typing import List
 import boto3
 import logging
 import time
-import os
 from botocore.exceptions import ClientError
 
 logger = logging.getLogger(__name__)

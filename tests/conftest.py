@@ -1,12 +1,12 @@
 from pyspark import SparkContext
 from awsglue.context import GlueContext
-from etl.mock.infrastructure.s3_resource import S3ResourceSingleton
+from mock.infrastructure.s3_resource import S3ResourceSingleton
 import pytest
 
 
 @pytest.fixture(scope="function")
 def s3_resource():
-    # Ensure teardown was completed previously and setup.
+    # Ensure teardown was completed previously and then set up.
     if S3ResourceSingleton._instance:
         print("Teardown was not completed correctly in an earlier test.")
         S3ResourceSingleton.teardown()

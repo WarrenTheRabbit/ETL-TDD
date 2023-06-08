@@ -6,9 +6,9 @@ import pytest
 from etl.jobs.landing.claim import read_data, transform_data, write_data
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType, StructField, StringType, IntegerType
-from etl.mock.infrastructure.mock_s3_server import S3ResourceSingleton, \
+from mock.infrastructure.mock_s3_server import S3ResourceSingleton, \
     get_mock_s3_server_and_its_local_process
-from etl.paths.components import Bucket
+from paths.components import Bucket
 
 SOURCE_NAME = "data.csv"
 TABLE_NAME = "dummy"

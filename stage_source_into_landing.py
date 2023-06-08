@@ -9,16 +9,16 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-from etl.mock.infrastructure.mock_s3_server import S3ResourceSingleton
-from etl.paths.components import Bucket
+from mock.infrastructure.mock_s3_server import S3ResourceSingleton
+from paths.components import Bucket
 
 def run(spark, env):
 
     # Define source and target file paths
     files = {
-        "/home/glue_user/project_lf/ETL-TDD/etl/mock/source_files/202305211851-claim-full.csv": f"s3://{env}/etl/landing/claim_db/claim/full/202305211851-claim-full.csv",
-        "/home/glue_user/project_lf/ETL-TDD/etl/mock/source_files/202305221132-policyholder-full.csv": f"s3://{env}/etl/landing/claim_db/policyholder/full/202305221132-policyholder-full.csv",
-        "/home/glue_user/project_lf/ETL-TDD/etl/mock/source_files/202305221136-provider-full.csv": f"s3://{env}/etl/landing/claim_db/provider/full/202305221136-provider-full.csv",
+        "/home/glue_user/project_lf/ETL-TDD/mock/source_files/202305211851-claim-full.csv": f"s3://{env}/etl/landing/claim_db/claim/full/202305211851-claim-full.csv",
+        "/home/glue_user/project_lf/ETL-TDD/mock/source_files/202305221132-policyholder-full.csv": f"s3://{env}/etl/landing/claim_db/policyholder/full/202305221132-policyholder-full.csv",
+        "/home/glue_user/project_lf/ETL-TDD/mock/source_files/202305221136-provider-full.csv": f"s3://{env}/etl/landing/claim_db/provider/full/202305221136-provider-full.csv",
     }
     
     # Get correct s3_resource.

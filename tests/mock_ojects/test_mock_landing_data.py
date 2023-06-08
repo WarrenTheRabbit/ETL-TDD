@@ -2,10 +2,10 @@ import os
 import signal
 import subprocess
 from pyspark.sql import SparkSession
-from etl.mock.data import claim, policyholder, provider
-from etl.mock.infrastructure.buckets import initialise_for_project
-import etl.mock.infrastructure.mock_s3_server as s3_mock_server
-from etl.paths.components import Bucket
+from mock.data import claim, policyholder, provider
+from mock.infrastructure.buckets import initialise_for_project
+import mock.infrastructure.mock_s3_server as s3_mock_server
+from paths.components import Bucket
 
 ENV = Bucket.TEST
 s3_mock_server.S3ResourceSingleton.teardown()

@@ -2,13 +2,13 @@ import etl.jobs.landing.claim
 import etl.jobs.landing.provider
 import etl.jobs.landing.policyholder
 import etl.jobs.raw.claim
-from etl.mock.infrastructure.mock_s3_server import S3ResourceSingleton
+from mock.infrastructure.mock_s3_server import S3ResourceSingleton
  
 from freezegun import freeze_time
 from datetime import datetime
-from etl.paths.components import Bucket, Source, Tier, Table, Environment, Load
-from etl.paths.timestamps import get_current_time_as_timestamp
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Tier, Table, Environment, Load
+from paths.timestamps import get_current_time_as_timestamp
+from paths.create import create_path
 ENV = Bucket.TEST
 S3ResourceSingleton.teardown()
 

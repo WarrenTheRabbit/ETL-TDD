@@ -1,5 +1,5 @@
-from etl.paths.components import Bucket, Source, Dimension, Fact, Table, Environment, Load, Tier
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Dimension, Fact, Table, Environment, Load, Tier
+from paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.functions import monotonically_increasing_id
 from typing import List

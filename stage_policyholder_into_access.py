@@ -9,7 +9,7 @@ from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
 
-from etl.paths.components import Bucket
+from paths.components import Bucket
 
 def run(spark: SparkSession, env:Bucket):
     

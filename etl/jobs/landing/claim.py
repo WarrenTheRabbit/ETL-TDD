@@ -1,6 +1,6 @@
 from awsglue import DynamicFrame
-from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Table, Environment, Load, Tier
+from paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
 

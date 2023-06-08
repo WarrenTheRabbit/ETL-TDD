@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.landing.policyholder import get_input_path, get_output_path
-from etl.paths.components import Bucket
-from etl.validation.schemas import landing as schema
+from paths.components import Bucket
+from validation.schemas import landing as schema
 from etl.jobs.landing.policyholder import read_data, transform_data, write_data
 
 import sys

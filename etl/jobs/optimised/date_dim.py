@@ -1,5 +1,5 @@
-from etl.paths.components import Bucket, Dimension, Environment, Load, Tier
-from etl.paths.create import create_path
+from paths.components import Bucket, Dimension, Environment, Load, Tier
+from paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 import pyspark.sql.functions as F
 from holidays import Australia
@@ -82,13 +82,13 @@ def create_date_dimension() -> pd.DataFrame:
 
 def transform_from_pandas_to_spark_dataframe(
             spark:SparkSession,
-            panda_df:pd.DataFrame,
-            schema) -> DataFrame:
-
-
+            panda_df:pd.DataFrame) -> DataFrame:
+    """
+    Return a spark dataframe with SCDs from a pandas dataframe.
+    """
     # Create a spark dataframe from the pandas dataframe.
     spark_df = (spark
-                .createDataFrame(panda_df,schema=schema)
+                .createDataFrame(panda_df)
                 # Ensure `date` column is a yyyy-MM-dd natural key.
                 .withColumn("date", F.date_format("date", "yyyy-MM-dd"))
     )

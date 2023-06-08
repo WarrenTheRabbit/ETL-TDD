@@ -9,8 +9,8 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from awsglue.context import GlueContext
 from awsglue.job import Job
-from etl.paths.components import Bucket
-import etl.validation.schemas.optimised as schemas
+from paths.components import Bucket
+import validation.schemas.optimised as schemas
 
 def run(spark:SparkSession, env):
    
@@ -18,10 +18,8 @@ def run(spark:SparkSession, env):
     read_df:pd.DataFrame = create_date_dimension()
 
     # Apply transformations.  
-    schema = schemas.DATE
     spark_df = transform_from_pandas_to_spark_dataframe(spark, 
-                                                        read_df,
-                                                        schema)
+                                                        read_df)
 
     # Write transformed data to path.
     write_path = get_output_path(env)

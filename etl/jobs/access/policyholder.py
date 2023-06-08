@@ -1,5 +1,5 @@
-from etl.paths.components import Bucket, Source, Table, Dimension, Environment, Load, Tier
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Table, Dimension, Environment, Load, Tier
+from paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.optimised.attributes import with_slowly_changing_dimensions
 from pyspark.sql.functions import monotonically_increasing_id
@@ -44,7 +44,8 @@ def read_parquet_data(engine:SparkSession,
 
 def transform_data(policyholder_input:DataFrame,location_input:DataFrame) -> DataFrame:
     """
-    Return a DataFrame with the distinct rows from `df1` and `df2`, with a monotonically increasing surrogate `surrogate_key`.
+    Return a DataFrame with the distinct rows from `df1` and `df2`, with a 
+    monotonically increasing surrogate `surrogate_key`.
     """
 
     transformed_df = (

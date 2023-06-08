@@ -5,8 +5,8 @@ import pyspark.sql.functions as F
 from typing import Optional
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.sql.types import StructType
-from etl.paths.components import Bucket, Source, Table, Environment, Load, Tier, Fact
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Table, Environment, Load, Tier, Fact
+from paths.create import create_path
 
 # A path to the claim_db.claim table data that has been staged in Raw.
 def get_input_path(env:Bucket):

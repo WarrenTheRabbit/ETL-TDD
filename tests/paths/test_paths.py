@@ -5,15 +5,15 @@ from datetime import datetime
 import itertools
 
 from freezegun import freeze_time
-from etl.mock.infrastructure.s3_resource import S3ResourceSingleton
-from etl.paths.components import StringEnum
-from etl.paths.validation import get_validity_of_path_request, \
+from mock.infrastructure.s3_resource import S3ResourceSingleton
+from paths.components import StringEnum
+from paths.validation import get_validity_of_path_request, \
     only_landing_tier_paths_have_extensions, \
     only_one_table_type_per_path, only_nonanalytical_table_paths_have_sources
-from etl.paths.components import Environment, Bucket, Source
-from etl.paths.components import Table, Fact, Dimension, Load, Tier
-from etl.paths.timestamps import get_lexicographically_highest_subdirectory
-from etl.paths.create import create_path
+from paths.components import Environment, Bucket, Source
+from paths.components import Table, Fact, Dimension, Load, Tier
+from paths.timestamps import get_lexicographically_highest_subdirectory
+from paths.create import create_path
 
 ENV = Bucket.TEST
 S3ResourceSingleton.teardown()
@@ -32,9 +32,9 @@ def mock_get_time(*args, **kwargs):
 
 @pytest.fixture()
 def mock_time_functions(mocker):
-    mocker.patch('etl.paths.create.get_lexicographically_highest_subdirectory', 
+    mocker.patch('paths.create.get_lexicographically_highest_subdirectory', 
                 mock_get_lexicographically_highest_subdirectory)
-    mocker.patch('etl.paths.create.get_timestamp_for_file', mock_get_time)
+    mocker.patch('paths.create.get_timestamp_for_file', mock_get_time)
 
 class TestCreatePath:           
             
@@ -192,7 +192,7 @@ class TestGetLexicographicallyHighestSubdirectory:
             path = 'etl/raw/claim_db/claim/full/'
             
             result = get_lexicographically_highest_subdirectory(str(ENV),path)
-            expected = '202306040915'
+            expected = '202306071404'
         
             assert result == expected
         finally:

@@ -1,5 +1,5 @@
-from etl.paths.components import Bucket, Source, Dimension, Table, Environment, Load, Tier
-from etl.paths.create import create_path
+from paths.components import Bucket, Source, Dimension, Table, Environment, Load, Tier
+from paths.create import create_path
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.optimised.attributes import with_slowly_changing_dimensions 
 from pyspark.sql.functions import monotonically_increasing_id

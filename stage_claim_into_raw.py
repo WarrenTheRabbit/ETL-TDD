@@ -7,9 +7,9 @@ from awsglue.context import GlueContext
 from awsglue.job import Job
 from pyspark.sql import SparkSession, DataFrame
 from pyspark.context import SparkContext
-from etl.paths.components import Bucket
+from paths.components import Bucket
 
-from etl.validation.schemas import landing as claim_schema
+from validation.schemas import landing as claim_schema
 from etl.jobs.landing.claim import read_data, transform_data, write_data, \
     get_input_path, get_output_path
 

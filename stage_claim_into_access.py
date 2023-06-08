@@ -1,7 +1,7 @@
 from pyspark.sql import SparkSession, DataFrame
 from etl.jobs.raw.claim import get_input_path, get_output_path
 from etl.jobs.raw.claim import read_parquet_data, transform_data, write_data
-from etl.paths.components import Bucket
+from paths.components import Bucket
 import sys
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions

@@ -2,11 +2,11 @@ import pytest
 import pytz
 from freezegun import freeze_time
 from datetime import datetime
-from etl.mock.infrastructure.s3_resource import S3ResourceSingleton
+from mock.infrastructure.s3_resource import S3ResourceSingleton
 
-from etl.paths.components import Environment, Bucket, Source, StringEnum
-from etl.paths.components import Table, Fact, Dimension, Load, Tier
-from etl.paths.timestamps import get_timestamp_for_file, \
+from paths.components import Environment, Bucket, Source, StringEnum
+from paths.components import Table, Fact, Dimension, Load, Tier
+from paths.timestamps import get_timestamp_for_file, \
     get_timestamp_of_most_recently_created_file
 
 
